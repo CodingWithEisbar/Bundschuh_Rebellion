@@ -1,0 +1,38 @@
+name: Stage 1 verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  godot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install pinned Godot standard runtime
+        shell: bash
+        run: |
+          mkdir -p .tools
+          curl --fail --location --retry 3 --output .tools/godot.zip \
+            https://github.com/godotengine/godot-builds/releases/download/4.5.2-stable/Godot_v4.5.2-stable_linux.x86_64.zip
+          echo "87f6e6be292929e363d15ed9052f277b2ba4e95ed994e1e099048097be2dfd03  .tools/godot.zip" | sha256sum --check --strict
+          unzip -q .tools/godot.zip -d .tools
+          chmod +x .tools/Godot_v4.5.2-stable_linux.x86_64
+      - name: Import, regression tests, and scene smoke
+        run: python3 tools/verify.py --godot .tools/Godot_v4.5.2-stable_linux.x86_64
+      - name: Show simulation report
+        if: always()
+        shell: bash
+        run: |
+          if [ -f test-results/stage1.json ]; then
+            cat test-results/stage1.json
+          fi
