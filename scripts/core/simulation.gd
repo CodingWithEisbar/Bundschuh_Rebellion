@@ -18,6 +18,7 @@ var grid: WorldGrid
 var bank := ResourceBank.new()
 var paths: PathService
 var traffic := TrafficController.new()
+var combat: CombatWorld # Explicit opt-in backend; F6/F7 stay economy/nav fixtures.
 var agents: Dictionary = {}
 var resources: Dictionary = {}
 var buildings: Dictionary = {}
@@ -40,6 +41,21 @@ func _id() -> int:
 	var value := _next_id
 	_next_id += 1
 	return value
+
+
+func enable_combat(owner_id: int = 0, team_id: int = 0,
+		payroll_enabled: bool = false, wage: int = MercenaryMaintenance.DEFAULT_WAGE) -> CombatWorld:
+	## Bridge the fixed clock and this player's real bank into Stage 2. Combat
+	## soldiers have their own registry; the Stage 1 villager crowd is not silently
+	## repurposed as enemy/cavalry navigation. See the Stage 2 adapter contract.
+	if combat != null:
+		return combat
+	var backend := CombatWorld.new()
+	var side := CombatTypes.Faction.SWABIAN_LEAGUE if faction == "league" else CombatTypes.Faction.BUNDSCHUH
+	if not backend.add_player(owner_id, team_id, side, bank, payroll_enabled, wage):
+		return null
+	combat = backend
+	return combat
 
 
 func motion_alpha() -> float:
@@ -338,6 +354,10 @@ func place_building(key: String, origin: Vector2i, builders: Array[int]) -> RtsB
 func step(delta: float = FIXED_DT) -> void:
 	assert(delta > 0.0 and delta <= 0.25)
 	time += delta
+	# Payroll precedes this tick's gathering/deposits. Time advances only when
+	# the host steps the simulation, so pause and speed controls remain coherent.
+	if combat != null:
+		combat.advance(delta)
 	_move_elapsed = minf(MOVE_PERIOD, _move_elapsed + delta)
 	for agent: VillagerAgent in agents.values():
 		agent.capacity = 10 + (3 if faction == "league" and age >= 3 else 0)

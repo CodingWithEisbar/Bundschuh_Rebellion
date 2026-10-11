@@ -39,20 +39,28 @@ def main() -> int:
     version = subprocess.check_output([executable, "--version"], text=True).strip()
     if not version.startswith("4.5.2."):
         parser.error(f"Expected the pinned Godot 4.5.2 runtime, received {version}.")
-    report_path = ROOT / "test-results" / "stage1.json"
-    report_path.unlink(missing_ok=True)
+    reports = [
+        ("tests/run_tests.gd", ROOT / "test-results" / "stage1.json", 18),
+        ("tests/combat_tests.gd", ROOT / "test-results" / "stage2.json", 22),
+    ]
+    for _, report_path, _ in reports:
+        report_path.unlink(missing_ok=True)
     common = [executable, "--headless", "--path", str(ROOT)]
     try:
         run(common + ["--editor", "--import", "--quit"])
-        run(common + ["--script", "tests/run_tests.gd"])
-        if not report_path.is_file():
-            raise RuntimeError("Test runner exited without creating its report.")
-        report = json.loads(report_path.read_text())
-        if report["failed_assertions"] or report["passed"] < 18:
-            raise RuntimeError("Test report is incomplete or contains failures.")
+        passed = 0
+        for script, report_path, expected in reports:
+            run(common + ["--script", script])
+            if not report_path.is_file():
+                raise RuntimeError(f"Test runner did not create {report_path.name}.")
+            report = json.loads(report_path.read_text())
+            if report["failed_assertions"] or report["passed"] < expected:
+                raise RuntimeError(f"{report_path.name} is incomplete or contains failures.")
+            passed += report["passed"]
+        run(common + ["--script", "examples/stage2_backend_demo.gd"])
         run(common + ["--script", "tests/layout_smoke.gd"])
         run(common + ["--quit-after", "10"])
-        print(f"VERIFIED: {report['passed']} integration cases. Report: {report_path}")
+        print(f"VERIFIED: {passed} integration cases. Reports: {ROOT / 'test-results'}")
     except (RuntimeError, subprocess.SubprocessError, OSError, ValueError) as error:
         print(str(error), file=sys.stderr)
         return 1

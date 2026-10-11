@@ -1,6 +1,7 @@
 # Bundschuh: Rebellion
 
 **Stage 1 — Core RTS Prototype & Pathfinding**
+**Stage 2 — Combat Matrix & Asymmetrical Mechanics (backend)**
 Engine được ghim: **Godot 4.5.2 Standard**, GDScript có kiểu dữ liệu. Mở project và chạy ngay, không cần .NET, asset pack hoặc plugin trả phí.
 
 Đây là nền prototype có mã nguồn, scene điều khiển và regression tests. Presentation hiện là top-down greybox để kiểm tra gameplay; hướng isometric sprite và art/audio của GDD Phase 4 sẽ được áp dụng ở giai đoạn nội dung.
@@ -30,6 +31,9 @@ Không cần export templates để chạy bằng editor. Repo không chứa bin
 | Villager AI | Idle → MoveToResource → Gather → ReturnToDropoff; trạng thái chờ, xây dựng, đổi nhiệm vụ và xử lý mục tiêu mất |
 | Placement | Snap theo grid; xanh BUILD / đỏ BLOCKED; kiểm tra footprint, quân đang đi, tài nguyên, chi phí và đường tiếp cận |
 | Construction | Foundation bắt đầu 0 HP; nhiều dân đóng góp công; tăng tới MaxHP; completion phát một lần |
+| Combat backend | Damage M/P + armor-class counters; Pike +25 Cavalry; attack cooldown và damage cùng tick |
+| Zeal aura | Spatial hash mỗi 1s, bán kính 6 ô; +15% attack rate/movement speed cho đồng minh, không stack |
+| Mercenary payroll | Scenario opt-in, mỗi 30s trừ Gold/Landsknecht; kho về 0 thì đổi ownership sang hostile và emit DesertionEvent |
 | Drop-offs | Town Center nhận cả bốn loại; Mill nhận Food; Lumber Camp nhận Wood; Mining Camp nhận Gold/Stone |
 | HUD & input | Chọn/kéo chọn/Shift, lệnh theo ngữ cảnh, minimap, camera, pause, tốc độ 1×/4×, progress/HP/cargo |
 | Verification | Tests chạy bằng Godot thật; kiểm tra 200 quân qua choke một ô, đi ngược chiều, bảo toàn tài nguyên và construction |
@@ -75,9 +79,24 @@ Linux/macOS:
 
     python3 tools/verify.py --godot /path/to/godot
 
-Lệnh thực hiện import/compile, regression tests, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
+Lệnh thực hiện import/compile, regression tests cả hai stage, backend demo, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json** và **test-results/stage2.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
 
 CI tương ứng: [.github/workflows/godot.yml](.github/workflows/godot.yml). Workflow ghim engine và checksum, chỉ cần quyền đọc nội dung repo.
+
+## Thử Stage 2 backend
+
+F5/F6/F7 vẫn chạy sandbox economy/navigation. Để chạy ví dụ combat, aura và payroll:
+
+    godot --headless --path . --script examples/stage2_backend_demo.gd
+
+Thay `godot` bằng đường dẫn engine trên máy bro. Demo chạy 90 giây mô phỏng nhanh
+nhất có thể, in damage Pike → Ritter, chỉ số aura và ba kỳ lương, rồi kết thúc bằng
+**BACKEND DEMO: PASS**. Code tích hợp có trong [Stage 2 guide](docs/STAGE_2_COMBAT.md).
+
+Luật Stage 2 mới thay aura damage trong GDD bằng **+15% tốc đánh/tốc chạy**, và dùng
+kỳ lương **30s**, mặc định **1G/quân/kỳ**, chỉnh được. Theo prompt, trả vừa đủ để
+Gold về 0 cũng gây mutiny. Payroll được bật riêng cho scenario; không tự thêm vào
+skirmish. [Tài liệu](docs/STAGE_2_COMBAT.md) ghi rõ các khác biệt với GDD cũ.
 
 ## Tổ chức source
 
@@ -88,17 +107,23 @@ CI tương ứng: [.github/workflows/godot.yml](.github/workflows/godot.yml). Wo
 | [scripts/economy](scripts/economy) | Resource types, finite nodes, global bank |
 | [scripts/units](scripts/units) | Villager data và state machine |
 | [scripts/construction](scripts/construction) | Building catalog, work/HP/completion |
+| [scripts/combat](scripts/combat) | CombatWorld, damage, stat modifiers, spatial aura và mercenary payroll |
 | [scripts/presentation](scripts/presentation) | Input, greybox renderer, minimap, HUD |
 | [tests/run_tests.gd](tests/run_tests.gd) | Integration tests dùng chính model của game |
+| [tests/combat_tests.gd](tests/combat_tests.gd) | Combat/aura/payroll regression và mass-battle benchmark |
+| [examples/stage2_backend_demo.gd](examples/stage2_backend_demo.gd) | Ví dụ backend chạy được qua command line |
 | [docs/STAGE_1_ARCHITECTURE.md](docs/STAGE_1_ARCHITECTURE.md) | Luồng dữ liệu, thuật toán, invariants và extension points |
 | [docs/STAGE_1_VALIDATION.md](docs/STAGE_1_VALIDATION.md) | Phạm vi kiểm thử, kết quả và giới hạn |
+| [docs/STAGE_2_COMBAT.md](docs/STAGE_2_COMBAT.md) | Luật Stage 2, API/events, timing, movement adapter và ví dụ |
+| [docs/STAGE_2_VALIDATION.md](docs/STAGE_2_VALIDATION.md) | Kết quả và phạm vi kiểm thử backend |
 | [docs/gdd](docs/gdd) | Bốn phase thiết kế làm nền cho các stage tiếp theo |
 | [AGENTS.md](AGENTS.md) | Quy tắc thay đổi source cho người và AI agent |
 
-## Giới hạn của Stage 1
+## Giới hạn hiện tại
 
 - Navigation được kiểm tra cho **tối đa 200 friendly foot units cùng kích thước**. Passing dùng bán kính 0,18 ô; siege/cavalry lớn cần clearance và quy tắc giao thông riêng trước khi thêm.
 - Có gather bonus Food/Wood Bundschuh và carry bonus League A3 ở lớp model. Demo đang dùng Bundschuh A1; chưa có màn chọn phe/age-up.
-- Chưa có combat, fog of war, tech tree, unit recruitment, campaign triggers, save/load hoặc multiplayer. Housing được theo dõi; giới hạn spawn thường kiểm tra housing, còn fixture cấp quân có nhãn riêng.
+- Stage 2 có backend combat; chưa gắn military roster/speed modifiers vào controller di chuyển dân hoặc scene F5. Military navigation, lựa chọn quân và giao diện combat là bước tích hợp tiếp theo. Combat API trả movement budget đã buff; không tự di chuyển xuyên vật cản.
+- Chưa có fog of war, tech tree, unit recruitment, campaign triggers, save/load hoặc multiplayer. Housing được theo dõi ở Stage 1; combat spawn là API scenario riêng, chưa thu chi phí tuyển hoặc kiểm tra housing.
 - Gather rates, building HP/footprints và công thức nhiều dân xây là tham số prototype được ghi trong architecture; chưa phải kết quả cân bằng cuối.
 - Hiệu năng headless của simulation không phải FPS đồ họa. Kiểm tra GPU/rendering và playtest trên máy mục tiêu là bước tiếp theo trước khi gọi đây là bản production hoàn chỉnh.
