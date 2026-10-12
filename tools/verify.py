@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -17,8 +18,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run(command: list[str], timeout: int = 180) -> None:
-    result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, timeout=timeout)
+def run(command: list[str], timeout: int = 180, env: dict[str, str] | None = None) -> None:
+    result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, timeout=timeout, env=env)
     combined = result.stdout + result.stderr
     print(combined, end="")
     # Godot can exit 0 after some import/parse errors. Do not trust exit code alone.
@@ -44,9 +45,14 @@ def main() -> int:
         ("tests/combat_tests.gd", ROOT / "test-results" / "stage2.json", 22),
         ("tests/stage3_tests.gd", ROOT / "test-results" / "stage3.json", 21),
         ("tests/stage4_tests.gd", ROOT / "test-results" / "stage4.json", 23),
+        ("tests/stage5_tests.gd", ROOT / "test-results" / "stage5.json", 16),
     ]
+    (ROOT / "test-results").mkdir(exist_ok=True)
+    (ROOT / "test-results" / ".gdignore").touch()
     for _, report_path, _ in reports:
         report_path.unlink(missing_ok=True)
+    python_report_path = ROOT / "test-results" / "stage5_python.json"
+    python_report_path.unlink(missing_ok=True)
     common = [executable, "--headless", "--path", str(ROOT)]
     try:
         run(common + ["--editor", "--import", "--quit"])
@@ -59,6 +65,15 @@ def main() -> int:
             if report["failed_assertions"] or report["passed"] < expected:
                 raise RuntimeError(f"{report_path.name} is incomplete or contains failures.")
             passed += report["passed"]
+        tool_env = dict(os.environ)
+        tool_env["BUNDSCHUH_TEST_GODOT"] = executable
+        run([sys.executable, "tests/test_balance_tools.py"], env=tool_env)
+        python_report = json.loads(python_report_path.read_text())
+        if python_report["failed_assertions"] or python_report["skipped"] or python_report["passed"] < 7:
+            raise RuntimeError("Python balance tools/reload tests incomplete or failed.")
+        passed += python_report["passed"]
+        run([sys.executable, "tools/balance.py", "simulate", "--godot", executable,
+             "--output", str(ROOT / "test-results" / "stage5_cli")])
         run(common + ["--script", "examples/stage2_backend_demo.gd"])
         run(common + ["--script", "examples/stage3_backend_demo.gd"])
         run(common + ["--script", "examples/stage4_backend_demo.gd"])

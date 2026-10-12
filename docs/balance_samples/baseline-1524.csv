@@ -1,0 +1,3 @@
+seed,database_sha256,outcome,winner_team,simulation_seconds,team,unit_id,count,survivors,casualties,survival_rate,initial_hp,remaining_hp,hp_retention_rate,mean_survivor_hp,food,wood,gold,stone
+1524,a003cc27a4343aeb8be1a1250420c9f3450c1618b7ff42fa539e6427783a0641,elimination,1,92.45,0,peasant_flailman,100,0,100,0.0,4500,0,0.0,0.0,4500,1500,0,0
+1524,a003cc27a4343aeb8be1a1250420c9f3450c1618b7ff42fa539e6427783a0641,elimination,1,92.45,1,heavy_gendarme,20,6,14,0.3,2500,190,0.076,31.666666666666668,1800,0,2000,0

@@ -3,5 +3,7 @@
 .tools/
 build/
 test-results/
+balance-results/
+__pycache__/
 *.log
 .DS_Store

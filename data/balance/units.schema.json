@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bundschuh:units:v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "balance_id",
+    "stat_basis",
+    "source_document",
+    "ruleset_notes",
+    "units"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "balance_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "stat_basis": {
+      "enum": [
+        "base_before_faction_and_tech"
+      ]
+    },
+    "source_document": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "ruleset_notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000
+      },
+      "maxItems": 20
+    },
+    "units": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/unit"
+      }
+    }
+  },
+  "$defs": {
+    "unit": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "source_name",
+        "aliases",
+        "kind",
+        "faction",
+        "age",
+        "economy",
+        "combat",
+        "movement",
+        "zeal",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "source_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "uniqueItems": true,
+          "maxItems": 8
+        },
+        "kind": {
+          "enum": [
+            "VILLAGER",
+            "PIKEMAN",
+            "FLAILMAN",
+            "RADICAL_PREACHER",
+            "LANDSKNECHT",
+            "ARMOURED_RITTER",
+            "CROSSBOWMAN",
+            "SKIRMISHER",
+            "ARQUEBUSIER",
+            "LIGHT_CAVALRY"
+          ]
+        },
+        "faction": {
+          "enum": [
+            "bundschuh",
+            "swabian_league",
+            "either"
+          ]
+        },
+        "age": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "economy": {
+          "type": "object",
+          "required": [
+            "cost",
+            "population",
+            "train_seconds"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "cost": {
+              "type": "object",
+              "required": [
+                "food",
+                "wood",
+                "gold",
+                "stone"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "food": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "wood": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "gold": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                },
+                "stone": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000
+                }
+              }
+            },
+            "population": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "train_seconds": {
+              "type": "number",
+              "minimum": 0.05,
+              "maximum": 3600
+            }
+          }
+        },
+        "combat": {
+          "type": "object",
+          "required": [
+            "hp",
+            "attack",
+            "damage_type",
+            "armor",
+            "armor_classes",
+            "bonus_damage",
+            "bonus_armor",
+            "attack_period",
+            "range_tiles",
+            "minimum_range_tiles",
+            "impact_fraction"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "hp": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000
+            },
+            "attack": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "damage_type": {
+              "enum": [
+                "melee",
+                "pierce"
+              ]
+            },
+            "armor": {
+              "type": "object",
+              "required": [
+                "melee",
+                "pierce"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "melee": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "pierce": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                }
+              }
+            },
+            "armor_classes": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "infantry",
+                  "spear",
+                  "cavalry",
+                  "archer",
+                  "clergy",
+                  "siege",
+                  "building"
+                ]
+              },
+              "uniqueItems": true,
+              "maxItems": 7
+            },
+            "bonus_damage": {
+              "type": "object",
+              "propertyNames": {
+                "enum": [
+                  "infantry",
+                  "spear",
+                  "cavalry",
+                  "archer",
+                  "clergy",
+                  "siege",
+                  "building"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "bonus_armor": {
+              "type": "object",
+              "propertyNames": {
+                "enum": [
+                  "infantry",
+                  "spear",
+                  "cavalry",
+                  "archer",
+                  "clergy",
+                  "siege",
+                  "building"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "attack_period": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 120
+            },
+            "range_tiles": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "minimum_range_tiles": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 30
+            },
+            "impact_fraction": {
+              "type": "number",
+              "minimum": 0,
+              "exclusiveMaximum": 1
+            }
+          }
+        },
+        "movement": {
+          "type": "object",
+          "required": [
+            "speed_tiles_per_second",
+            "body_radius_tiles"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "speed_tiles_per_second": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 10
+            },
+            "body_radius_tiles": {
+              "type": "number",
+              "minimum": 0.05,
+              "maximum": 1
+            }
+          }
+        },
+        "zeal": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "radius_tiles",
+            "attack_rate_multiplier",
+            "movement_rate_multiplier"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "radius_tiles": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "attack_rate_multiplier": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "movement_rate_multiplier": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 3
+            }
+          }
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}

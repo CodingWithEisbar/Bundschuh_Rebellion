@@ -19,18 +19,23 @@ func refresh(units: Dictionary, spatial: CombatSpatialHash) -> void:
 	for source: CombatUnit in units.values():
 		if not source.alive() or not source.on_field or source.mutinous:
 			continue
-		if source.kind != CombatTypes.UnitType.RADICAL_PREACHER or source.faction != CombatTypes.Faction.BUNDSCHUH:
+		if source.kind != CombatTypes.UnitType.RADICAL_PREACHER or source.faction != CombatTypes.Faction.BUNDSCHUH or not source.zeal.get("enabled", false):
 			continue
 		sources_last_scan += 1
-		for target in spatial.query_circle(source.position, RADIUS):
+		for target in spatial.query_circle(source.position, float(source.zeal["radius_tiles"])):
 			if target.team_id == source.team_id:
-				next[target.id] = true
+				# Strongest value per stat wins; never multiply by source count.
+				var rates: Vector2 = next.get(target.id, Vector2.ONE)
+				rates.x = maxf(rates.x, float(source.zeal["attack_rate_multiplier"]))
+				rates.y = maxf(rates.y, float(source.zeal["movement_rate_multiplier"]))
+				next[target.id] = rates
 	for id: int in _recipients:
 		if not next.has(id) and units.has(id):
 			units[id].modifiers.remove_effect(EFFECT_ID)
 	for id: int in next:
 		var target: CombatUnit = units[id]
-		target.modifiers.set_effect(EFFECT_ID, RATE, RATE)
+		var rates: Vector2 = next[id]
+		target.modifiers.set_effect(EFFECT_ID, rates.x, rates.y)
 	_recipients = next
 	targets_last_scan = next.size()
 	scans += 1

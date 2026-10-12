@@ -1,0 +1,509 @@
+{
+  "schema_version": 1,
+  "balance_id": "phase2_base_stage5_v1",
+  "stat_basis": "base_before_faction_and_tech",
+  "source_document": "docs/gdd/BUNDSCHUH_REBELLION_GDD_PHASE_2.md sections 4 and 5.1",
+  "ruleset_notes": [
+    "Base values only: no faction discount, armor, Blacksmith, Elite or other technology modifiers.",
+    "Stage 2 overrides: Pikeman +25 vs Cavalry; Preacher 6-tile x1.15 rate aura instead of GDD attack aura.",
+    "Heavy Gendarme maps to base Armoured Ritter. All body radii 0.18 and impact fractions 0 retain backend prototype defaults, not historical/GDD measurements.",
+    "Recruitment costs are reported, not deducted by scenario spawning. Healing, conversion, charge and relic mechanics are not activated by these records."
+  ],
+  "units": [
+    {
+      "id": "peasant_flailman",
+      "name": "Peasant Flailman",
+      "source_name": "Peasant Flailman",
+      "aliases": [],
+      "kind": "FLAILMAN",
+      "faction": "bundschuh",
+      "age": 2,
+      "economy": {
+        "cost": {
+          "food": 45,
+          "wood": 15,
+          "gold": 0,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 16
+      },
+      "combat": {
+        "hp": 45,
+        "attack": 7,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 0,
+          "pierce": 0
+        },
+        "armor_classes": [
+          "infantry"
+        ],
+        "bonus_damage": {
+          "spear": 4
+        },
+        "bonus_armor": {},
+        "attack_period": 2,
+        "range_tiles": 0.5,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 1.1,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "No splash or cavalry bonus. Cost is base 45F/15W; the 39F/15W faction-discounted price is not applied here."
+    },
+    {
+      "id": "radical_preacher",
+      "name": "Radical Preacher",
+      "source_name": "Radical Preacher",
+      "aliases": [],
+      "kind": "RADICAL_PREACHER",
+      "faction": "bundschuh",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 0,
+          "wood": 0,
+          "gold": 100,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 40
+      },
+      "combat": {
+        "hp": 35,
+        "attack": 0,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 0,
+          "pierce": 0
+        },
+        "armor_classes": [
+          "clergy"
+        ],
+        "bonus_damage": {},
+        "bonus_armor": {},
+        "attack_period": 0,
+        "range_tiles": 0,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 0.85,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": true,
+        "radius_tiles": 6,
+        "attack_rate_multiplier": 1.15,
+        "movement_rate_multiplier": 1.15
+      },
+      "notes": "Stage 2 overrides the GDD aura: allied attack/movement rates x1.15 within 6 tiles, sampled every second. GDD healing/relic transport remain unimplemented."
+    },
+    {
+      "id": "landsknecht_pikeman",
+      "name": "Landsknecht Pikeman",
+      "source_name": "Landsknecht Pikeman",
+      "aliases": [],
+      "kind": "LANDSKNECHT",
+      "faction": "swabian_league",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 55,
+          "wood": 0,
+          "gold": 35,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 26
+      },
+      "combat": {
+        "hp": 65,
+        "attack": 6,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 1,
+          "pierce": 0
+        },
+        "armor_classes": [
+          "infantry",
+          "spear"
+        ],
+        "bonus_damage": {
+          "cavalry": 24
+        },
+        "bonus_armor": {},
+        "attack_period": 2,
+        "range_tiles": 1,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 0.9,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Base A3 tier; no faction armor, Drill or Elite upgrade. Payroll is a separate scenario setting."
+    },
+    {
+      "id": "heavy_gendarme",
+      "name": "Heavy Gendarme",
+      "source_name": "Armoured Ritter",
+      "aliases": [
+        "armoured_ritter"
+      ],
+      "kind": "ARMOURED_RITTER",
+      "faction": "swabian_league",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 90,
+          "wood": 0,
+          "gold": 100,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 38
+      },
+      "combat": {
+        "hp": 125,
+        "attack": 12,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 2,
+          "pierce": 2
+        },
+        "armor_classes": [
+          "cavalry"
+        ],
+        "bonus_damage": {},
+        "bonus_armor": {},
+        "attack_period": 1.8,
+        "range_tiles": 0.5,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 1.3,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Stage 5 display-name alias for Phase 2 Armoured Ritter, not the 150 HP Elite Ritter. No charge, splash, Bloodlines or faction armor."
+    },
+    {
+      "id": "villager",
+      "name": "Villager",
+      "source_name": "Villager",
+      "aliases": [],
+      "kind": "VILLAGER",
+      "faction": "either",
+      "age": 1,
+      "economy": {
+        "cost": {
+          "food": 50,
+          "wood": 0,
+          "gold": 0,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 25
+      },
+      "combat": {
+        "hp": 25,
+        "attack": 3,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 0,
+          "pierce": 0
+        },
+        "armor_classes": [],
+        "bonus_damage": {},
+        "bonus_armor": {},
+        "attack_period": 2,
+        "range_tiles": 0.5,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 0.8,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Combat catalog only; Stage 1 worker navigation/economy is a separate model."
+    },
+    {
+      "id": "pikeman",
+      "name": "Pikeman",
+      "source_name": "Pikeman",
+      "aliases": [],
+      "kind": "PIKEMAN",
+      "faction": "either",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 35,
+          "wood": 25,
+          "gold": 0,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 22
+      },
+      "combat": {
+        "hp": 55,
+        "attack": 4,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 0,
+          "pierce": 0
+        },
+        "armor_classes": [
+          "infantry",
+          "spear"
+        ],
+        "bonus_damage": {
+          "cavalry": 25
+        },
+        "bonus_armor": {},
+        "attack_period": 3,
+        "range_tiles": 0.5,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 1,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Explicit Stage 2 +25 Cavalry override; Phase 2 listed +22."
+    },
+    {
+      "id": "crossbowman",
+      "name": "Crossbowman",
+      "source_name": "Crossbowman",
+      "aliases": [],
+      "kind": "CROSSBOWMAN",
+      "faction": "either",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 0,
+          "wood": 25,
+          "gold": 45,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 27
+      },
+      "combat": {
+        "hp": 45,
+        "attack": 5,
+        "damage_type": "pierce",
+        "armor": {
+          "melee": 0,
+          "pierce": 0
+        },
+        "armor_classes": [
+          "archer"
+        ],
+        "bonus_damage": {},
+        "bonus_armor": {},
+        "attack_period": 2,
+        "range_tiles": 5,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 0.96,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Base ranged tier; no projectile travel or accuracy model."
+    },
+    {
+      "id": "skirmisher",
+      "name": "Skirmisher",
+      "source_name": "Skirmisher",
+      "aliases": [],
+      "kind": "SKIRMISHER",
+      "faction": "either",
+      "age": 2,
+      "economy": {
+        "cost": {
+          "food": 25,
+          "wood": 35,
+          "gold": 0,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 22
+      },
+      "combat": {
+        "hp": 35,
+        "attack": 2,
+        "damage_type": "pierce",
+        "armor": {
+          "melee": 0,
+          "pierce": 3
+        },
+        "armor_classes": [
+          "archer"
+        ],
+        "bonus_damage": {
+          "archer": 3,
+          "spear": 2
+        },
+        "bonus_armor": {},
+        "attack_period": 3,
+        "range_tiles": 4,
+        "minimum_range_tiles": 1,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 0.96,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Minimum range is one tile; not the Elite tier."
+    },
+    {
+      "id": "arquebusier",
+      "name": "Arquebusier",
+      "source_name": "Arquebusier",
+      "aliases": [],
+      "kind": "ARQUEBUSIER",
+      "faction": "either",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 45,
+          "wood": 0,
+          "gold": 55,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 34
+      },
+      "combat": {
+        "hp": 45,
+        "attack": 16,
+        "damage_type": "pierce",
+        "armor": {
+          "melee": 0,
+          "pierce": 0
+        },
+        "armor_classes": [
+          "archer"
+        ],
+        "bonus_damage": {
+          "infantry": 6
+        },
+        "bonus_armor": {},
+        "attack_period": 3.5,
+        "range_tiles": 6,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 0.85,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Pierce channel; no true damage or League reload bonus applied."
+    },
+    {
+      "id": "light_cavalry",
+      "name": "Light Cavalry",
+      "source_name": "Light Cavalry",
+      "aliases": [],
+      "kind": "LIGHT_CAVALRY",
+      "faction": "either",
+      "age": 3,
+      "economy": {
+        "cost": {
+          "food": 80,
+          "wood": 0,
+          "gold": 0,
+          "stone": 0
+        },
+        "population": 1,
+        "train_seconds": 30
+      },
+      "combat": {
+        "hp": 80,
+        "attack": 7,
+        "damage_type": "melee",
+        "armor": {
+          "melee": 0,
+          "pierce": 2
+        },
+        "armor_classes": [
+          "cavalry"
+        ],
+        "bonus_damage": {
+          "clergy": 8
+        },
+        "bonus_armor": {},
+        "attack_period": 2,
+        "range_tiles": 0.5,
+        "minimum_range_tiles": 0,
+        "impact_fraction": 0
+      },
+      "movement": {
+        "speed_tiles_per_second": 1.5,
+        "body_radius_tiles": 0.18
+      },
+      "zeal": {
+        "enabled": false,
+        "radius_tiles": 0,
+        "attack_rate_multiplier": 1,
+        "movement_rate_multiplier": 1
+      },
+      "notes": "Base tier before Bloodlines/Husbandry."
+    }
+  ]
+}

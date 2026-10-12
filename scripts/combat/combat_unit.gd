@@ -9,6 +9,13 @@ var owner_id: int
 var team_id: int
 var faction: int
 var kind: int
+var definition_id: String = ""
+var database_sha256: String = ""
+var database_generation: int = 0
+var base_cost: Dictionary = {}
+var population: int = 1
+var train_seconds: float = 0.0
+var zeal: Dictionary = {}
 var position: Vector2
 var elevation: float = 0.0 # Vertical height; position.y is map north/south.
 var on_field: bool = true # False while garrisoned/transported; still on payroll.
@@ -51,6 +58,14 @@ func _init(entity_id: int, owner: int, team: int, side: int,
 	faction = side
 	position = point
 	kind = int(data["kind"])
+	definition_id = data.get("definition_id", "")
+	database_sha256 = data.get("database_sha256", "")
+	database_generation = int(data.get("database_generation", 0))
+	base_cost = data.get("cost", {}).duplicate()
+	population = int(data.get("population", 1))
+	train_seconds = float(data.get("train_seconds", 0.0))
+	zeal = data.get("zeal", {}).duplicate()
+	impact_fraction = float(data.get("impact_fraction", 0.0))
 	max_hp = int(data["max_hp"])
 	hp = max_hp
 	attack = int(data["attack"])

@@ -32,6 +32,11 @@ var _advancing: bool = false
 var _orders: Dictionary = {} # attacker ID -> target ID; only active orders tick.
 var _events: Array[Dictionary] = []
 var _terrain: WorldGrid
+var database: UnitDatabase
+
+
+func _init(unit_database: UnitDatabase = null) -> void:
+	database = unit_database if unit_database != null else CombatUnitCatalog.default_database()
 
 
 func set_attack_timing(id: int, impact_fraction: float) -> bool:
@@ -93,7 +98,16 @@ func spawn(kind: int, owner: int, position: Vector2) -> CombatUnit:
 	## age/housing before calling this. Combat IDs are local to this registry.
 	if _advancing or not players.has(owner) or units.size() >= MAX_UNITS or not _valid_position(position):
 		return null
-	var data := CombatUnitCatalog.definition(kind)
+	return _spawn_definition(database.definition_kind(kind), owner, position)
+
+
+func spawn_by_id(definition_id: String, owner: int, position: Vector2) -> CombatUnit:
+	if _advancing or not players.has(owner) or units.size() >= MAX_UNITS or not _valid_position(position):
+		return null
+	return _spawn_definition(database.definition(definition_id), owner, position)
+
+
+func _spawn_definition(data: Dictionary, owner: int, position: Vector2) -> CombatUnit:
 	if data.is_empty():
 		return null
 	var player: CombatPlayer = players[owner]

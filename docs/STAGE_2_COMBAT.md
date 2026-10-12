@@ -11,6 +11,9 @@ economy/navigation; Stage 2 chưa thêm giao diện điều khiển quân chiế
 > Stage 4 thêm wind-up tùy chọn và `attack_started`/`attack_cancelled`; xem
 > [Stage 4 guide](STAGE_4_ASSETS_AUDIO.md). Marker mặc định 0 giữ fixture này.
 
+> Stage 5 chuyển catalog sang JSON/schema, giữ các base stats và override dưới
+> đây. Xem [Stage 5 guide](STAGE_5_BALANCE.md) cho reload, cost metadata và arena.
+
 ## 1. Luật Stage 2 và quan hệ với GDD
 
 Yêu cầu triển khai Stage 2 mới nhất là nguồn quyết định cho các hàng dưới.

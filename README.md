@@ -4,6 +4,7 @@
 **Stage 2 — Combat Matrix & Asymmetrical Mechanics (backend)**
 **Stage 3 — Procedural Maps, High Ground & Mission Triggers**
 **Stage 4 — Asset Integration, Animation & Audio**
+**Stage 5 — Data-Driven Balance, Headless Arena & Runtime Reload**
 Engine được ghim: **Godot 4.5.2 Standard**, GDScript có kiểu dữ liệu. Mở project và chạy ngay, không cần .NET, asset pack hoặc plugin trả phí.
 
 Đây là nền prototype có mã nguồn, scene điều khiển và regression tests. Presentation hiện là top-down greybox để kiểm tra gameplay; hướng isometric sprite và art/audio của GDD Phase 4 sẽ được áp dụng ở giai đoạn nội dung.
@@ -42,6 +43,7 @@ Không cần export templates để chạy bằng editor. Repo không chứa bin
 | Drop-offs | Town Center nhận cả bốn loại; Mill nhận Food; Lumber Camp nhận Wood; Mining Camp nhận Gold/Stone |
 | HUD & input | Chọn/kéo chọn/Shift, lệnh theo ngữ cảnh, minimap, camera, pause, tốc độ 1×/4×, progress/HP/cargo |
 | Animation/audio lab | F9: Idle/Run/Attack/Die, wind-up/contact đồng bộ, adaptive music, voice routing theo phe, caption và pool |
+| Balance tools | JSON/schema, reload có revision, arena 100 Flailmen vs 20 Gendarmes ở 10×, JSON/CSV và Python CLI |
 | Verification | Tests chạy bằng Godot thật; kiểm tra 200 quân qua choke một ô, đi ngược chiều, bảo toàn tài nguyên và construction |
 
 ## Điều khiển
@@ -77,7 +79,7 @@ F6/F7/F8 **reset toàn bộ sandbox hiện tại**. F9 đổi sang scene lab và
 
 ## Chạy kiểm thử
 
-Cần Python 3 và Godot 4.5.2; không cần package Python bổ sung.
+Cần Python 3.10 trở lên và Godot 4.5.2; không cần package Python bổ sung.
 
 Windows PowerShell, thay đường dẫn bằng vị trí Godot thực tế:
 
@@ -87,7 +89,7 @@ Linux/macOS:
 
     python3 tools/verify.py --godot /path/to/godot
 
-Lệnh thực hiện import/compile, regression tests cả bốn stage, ba demo tích hợp, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json**, **stage2.json**, **stage3.json** và **stage4.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
+Lệnh thực hiện import/compile, regression tests cả năm stage, Python parser/live-reload tests, trận balance 10×, ba demo tích hợp, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json** tới **stage5.json**, thêm **stage5_python.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
 
 CI tương ứng: [.github/workflows/godot.yml](.github/workflows/godot.yml). Workflow ghim engine và checksum, chỉ cần quyền đọc nội dung repo.
 
@@ -139,6 +141,30 @@ Wind-up là tùy chọn theo unit; lab bật, các fixture Stage 2/3 cũ giữ m
 tương thích. Animation đọc simulation, không tự gây damage. Run trong lab là
 preview tại chỗ; military navigation và art toàn bộ sandbox chưa nằm trong stage.
 
+## Thử Stage 5
+
+    python tools/balance.py validate
+    python tools/balance.py simulate --godot /path/to/godot
+
+Mặc định chạy **100 Peasant Flailmen vs 20 Heavy Gendarmes**, seed 1524, tốc độ
+10× bằng fixed ticks thật. JSON/CSV xuất vào `balance-results/`, gồm survivors,
+HP còn lại, thời gian game/thực, chi phí từng loại và snapshot/hash cấu hình.
+Heavy Gendarme dùng base stats **Armoured Ritter** trong GDD: 125 HP, 12 attack,
+giáp 2/2, 90F+100G; không lấy nhầm Elite hoặc nâng cấp đã cộng bonus.
+
+Sửa bản sao của [unit database](data/balance/units.v1.json), rồi chạy session reload:
+
+    python tools/balance.py watch --godot /path/to/godot --database /path/to/experiment.json
+
+File hợp lệ được dùng cho trận kế tiếp trong cùng process; file lỗi giữ revision
+cũ. Quân đang đánh giữ HP/cooldown cũ. `--unpaced --runs 5` chạy batch nhiều seed
+nhanh nhất CPU; đây là chế độ khác với paced 10×. F5/F9 không tự watch file.
+
+[Stage 5 guide](docs/STAGE_5_BALANCE.md) có cấu trúc JSON, Python/Godot API, reload
+policy, cách đọc báo cáo và giới hạn. [Validation](docs/STAGE_5_VALIDATION.md)
+ghi kết quả thật; arena kín dùng local steering, chưa thay military pathfinding
+cho map rừng/cầu hoặc chứng minh win rate skirmish.
+
 ## Tổ chức source
 
 | Đường dẫn | Trách nhiệm |
@@ -149,6 +175,11 @@ preview tại chỗ; military navigation và art toàn bộ sandbox chưa nằm 
 | [scripts/units](scripts/units) | Villager data và state machine |
 | [scripts/construction](scripts/construction) | Building catalog, work/HP/completion |
 | [scripts/combat](scripts/combat) | CombatWorld, damage, stat modifiers, spatial aura và mercenary payroll |
+| [scripts/balance](scripts/balance) | Schema/syntax validation, versioned database, closed arena và fixed-step pacing |
+| [data/balance](data/balance) | JSON base stats của 10 combat units và schema dùng chung |
+| [tools/balance.py](tools/balance.py) / [tools/unit_db.py](tools/unit_db.py) | Python CLI, parser, JSON/CSV reports và watch |
+| [docs/STAGE_5_BALANCE.md](docs/STAGE_5_BALANCE.md) | Designer workflow, base stats, simulation và runtime reload |
+| [docs/STAGE_5_VALIDATION.md](docs/STAGE_5_VALIDATION.md) | Regression results, baseline và giới hạn diễn giải balance |
 | [scripts/maps](scripts/maps) | Recipe, seeded generator, validation và playable factory |
 | [scripts/missions](scripts/missions) | Mission state, exposure/counts và Area2D LOS adapter |
 | [data](data) | Map/mission Resources chỉnh qua Inspector |

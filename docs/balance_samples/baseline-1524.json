@@ -1,0 +1,1312 @@
+{
+	"arena_tiles": [
+		40.0,
+		32.0
+	],
+	"arena_version": 1,
+	"assumptions": [
+		"Flat closed arena; no fog, obstacles, upgrades, economy, payroll or player micro.",
+		"Seeded deployment, greedy targeting and swept-circle steering; not the full military pathfinder.",
+		"Costs are base recruitment vectors, not equal-resource armies or actual spending.",
+		"A repeatable micro scenario is not a skirmish win rate or a final balance verdict."
+	],
+	"attacks_resolved": 862,
+	"balance_id": "phase2_base_stage5_v1",
+	"blocked_move_attempts": 65112,
+	"database_generation": 1,
+	"database_sha256": "a003cc27a4343aeb8be1a1250420c9f3450c1618b7ff42fa539e6427783a0641",
+	"engine": "4.5.2-stable (official)",
+	"first_hit_seconds": 6.35000000000000053,
+	"fixed_dt": 0.0500000000000000028,
+	"max_ticks": 6000,
+	"outcome": "elimination",
+	"report_version": 1,
+	"seed": 1524,
+	"simulation_seconds": 92.4500000000000028,
+	"stat_basis": "base_before_faction_and_tech",
+	"swapped_sides": false,
+	"teams": [
+		{
+			"base_army_cost": {
+				"food": 4500,
+				"gold": 0,
+				"stone": 0,
+				"wood": 1500
+			},
+			"casualties": 100,
+			"count": 100,
+			"hp_retention_rate": 0.0,
+			"initial_hp": 4500,
+			"mean_survivor_hp": 0.0,
+			"population": 100,
+			"remaining_hp": 0,
+			"survival_rate": 0.0,
+			"survivors": 0,
+			"team": 0,
+			"unit_id": "peasant_flailman",
+			"unit_snapshot": {
+				"age": 2.0,
+				"aliases": [],
+				"combat": {
+					"armor": {
+						"melee": 0.0,
+						"pierce": 0.0
+					},
+					"armor_classes": [
+						"infantry"
+					],
+					"attack": 7.0,
+					"attack_period": 2.0,
+					"bonus_armor": {
+
+					},
+					"bonus_damage": {
+						"spear": 4.0
+					},
+					"damage_type": "melee",
+					"hp": 45.0,
+					"impact_fraction": 0.0,
+					"minimum_range_tiles": 0.0,
+					"range_tiles": 0.5
+				},
+				"economy": {
+					"cost": {
+						"food": 45.0,
+						"gold": 0.0,
+						"stone": 0.0,
+						"wood": 15.0
+					},
+					"population": 1.0,
+					"train_seconds": 16.0
+				},
+				"faction": "bundschuh",
+				"id": "peasant_flailman",
+				"kind": "FLAILMAN",
+				"movement": {
+					"body_radius_tiles": 0.179999999999999993,
+					"speed_tiles_per_second": 1.10000000000000009
+				},
+				"name": "Peasant Flailman",
+				"notes": "No splash or cavalry bonus. Cost is base 45F/15W; the 39F/15W faction-discounted price is not applied here.",
+				"source_name": "Peasant Flailman",
+				"zeal": {
+					"attack_rate_multiplier": 1.0,
+					"enabled": false,
+					"movement_rate_multiplier": 1.0,
+					"radius_tiles": 0.0
+				}
+			}
+		},
+		{
+			"base_army_cost": {
+				"food": 1800,
+				"gold": 2000,
+				"stone": 0,
+				"wood": 0
+			},
+			"casualties": 14,
+			"count": 20,
+			"hp_retention_rate": 0.0759999999999999981,
+			"initial_hp": 2500,
+			"mean_survivor_hp": 31.6666666666666679,
+			"population": 20,
+			"remaining_hp": 190,
+			"survival_rate": 0.299999999999999989,
+			"survivors": 6,
+			"team": 1,
+			"unit_id": "heavy_gendarme",
+			"unit_snapshot": {
+				"age": 3.0,
+				"aliases": [
+					"armoured_ritter"
+				],
+				"combat": {
+					"armor": {
+						"melee": 2.0,
+						"pierce": 2.0
+					},
+					"armor_classes": [
+						"cavalry"
+					],
+					"attack": 12.0,
+					"attack_period": 1.80000000000000004,
+					"bonus_armor": {
+
+					},
+					"bonus_damage": {
+
+					},
+					"damage_type": "melee",
+					"hp": 125.0,
+					"impact_fraction": 0.0,
+					"minimum_range_tiles": 0.0,
+					"range_tiles": 0.5
+				},
+				"economy": {
+					"cost": {
+						"food": 90.0,
+						"gold": 100.0,
+						"stone": 0.0,
+						"wood": 0.0
+					},
+					"population": 1.0,
+					"train_seconds": 38.0
+				},
+				"faction": "swabian_league",
+				"id": "heavy_gendarme",
+				"kind": "ARMOURED_RITTER",
+				"movement": {
+					"body_radius_tiles": 0.179999999999999993,
+					"speed_tiles_per_second": 1.30000000000000004
+				},
+				"name": "Heavy Gendarme",
+				"notes": "Stage 5 display-name alias for Phase 2 Armoured Ritter, not the 150 HP Elite Ritter. No charge, splash, Bloodlines or faction armor.",
+				"source_name": "Armoured Ritter",
+				"zeal": {
+					"attack_rate_multiplier": 1.0,
+					"enabled": false,
+					"movement_rate_multiplier": 1.0,
+					"radius_tiles": 0.0
+				}
+			}
+		}
+	],
+	"ticks": 1849,
+	"timeline": [
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 0.0,
+			"tick": 0
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 1.0,
+			"tick": 20
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 2.0,
+			"tick": 40
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 3.0,
+			"tick": 60
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 4.0,
+			"tick": 80
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 5.0,
+			"tick": 100
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4500,
+				2500
+			],
+			"seconds": 6.0,
+			"tick": 120
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4428,
+				2465
+			],
+			"seconds": 7.0,
+			"tick": 140
+		},
+		{
+			"alive": [
+				100,
+				20
+			],
+			"hp": [
+				4392,
+				2450
+			],
+			"seconds": 8.0,
+			"tick": 160
+		},
+		{
+			"alive": [
+				99,
+				20
+			],
+			"hp": [
+				4311,
+				2410
+			],
+			"seconds": 9.0,
+			"tick": 180
+		},
+		{
+			"alive": [
+				99,
+				20
+			],
+			"hp": [
+				4239,
+				2395
+			],
+			"seconds": 10.0,
+			"tick": 200
+		},
+		{
+			"alive": [
+				99,
+				20
+			],
+			"hp": [
+				4191,
+				2355
+			],
+			"seconds": 11.0,
+			"tick": 220
+		},
+		{
+			"alive": [
+				96,
+				20
+			],
+			"hp": [
+				4116,
+				2325
+			],
+			"seconds": 12.0,
+			"tick": 240
+		},
+		{
+			"alive": [
+				94,
+				20
+			],
+			"hp": [
+				4086,
+				2290
+			],
+			"seconds": 13.0,
+			"tick": 260
+		},
+		{
+			"alive": [
+				92,
+				20
+			],
+			"hp": [
+				4008,
+				2260
+			],
+			"seconds": 14.0,
+			"tick": 280
+		},
+		{
+			"alive": [
+				91,
+				20
+			],
+			"hp": [
+				3975,
+				2235
+			],
+			"seconds": 15.0,
+			"tick": 300
+		},
+		{
+			"alive": [
+				90,
+				20
+			],
+			"hp": [
+				3882,
+				2200
+			],
+			"seconds": 16.0,
+			"tick": 320
+		},
+		{
+			"alive": [
+				89,
+				20
+			],
+			"hp": [
+				3861,
+				2180
+			],
+			"seconds": 17.0,
+			"tick": 340
+		},
+		{
+			"alive": [
+				88,
+				20
+			],
+			"hp": [
+				3768,
+				2140
+			],
+			"seconds": 18.0,
+			"tick": 360
+		},
+		{
+			"alive": [
+				86,
+				20
+			],
+			"hp": [
+				3726,
+				2120
+			],
+			"seconds": 19.0,
+			"tick": 380
+		},
+		{
+			"alive": [
+				84,
+				20
+			],
+			"hp": [
+				3660,
+				2060
+			],
+			"seconds": 20.0,
+			"tick": 400
+		},
+		{
+			"alive": [
+				82,
+				20
+			],
+			"hp": [
+				3594,
+				2050
+			],
+			"seconds": 21.0,
+			"tick": 420
+		},
+		{
+			"alive": [
+				81,
+				20
+			],
+			"hp": [
+				3549,
+				1990
+			],
+			"seconds": 22.0,
+			"tick": 440
+		},
+		{
+			"alive": [
+				80,
+				20
+			],
+			"hp": [
+				3480,
+				1970
+			],
+			"seconds": 23.0,
+			"tick": 460
+		},
+		{
+			"alive": [
+				79,
+				20
+			],
+			"hp": [
+				3435,
+				1920
+			],
+			"seconds": 24.0,
+			"tick": 480
+		},
+		{
+			"alive": [
+				76,
+				20
+			],
+			"hp": [
+				3348,
+				1890
+			],
+			"seconds": 25.0,
+			"tick": 500
+		},
+		{
+			"alive": [
+				76,
+				20
+			],
+			"hp": [
+				3312,
+				1855
+			],
+			"seconds": 26.0,
+			"tick": 520
+		},
+		{
+			"alive": [
+				74,
+				20
+			],
+			"hp": [
+				3210,
+				1825
+			],
+			"seconds": 27.0,
+			"tick": 540
+		},
+		{
+			"alive": [
+				74,
+				20
+			],
+			"hp": [
+				3174,
+				1800
+			],
+			"seconds": 28.0,
+			"tick": 560
+		},
+		{
+			"alive": [
+				74,
+				20
+			],
+			"hp": [
+				3090,
+				1770
+			],
+			"seconds": 29.0,
+			"tick": 580
+		},
+		{
+			"alive": [
+				73,
+				20
+			],
+			"hp": [
+				3021,
+				1735
+			],
+			"seconds": 30.0,
+			"tick": 600
+		},
+		{
+			"alive": [
+				70,
+				20
+			],
+			"hp": [
+				2982,
+				1700
+			],
+			"seconds": 31.0,
+			"tick": 620
+		},
+		{
+			"alive": [
+				67,
+				20
+			],
+			"hp": [
+				2919,
+				1665
+			],
+			"seconds": 32.0,
+			"tick": 640
+		},
+		{
+			"alive": [
+				66,
+				20
+			],
+			"hp": [
+				2886,
+				1635
+			],
+			"seconds": 33.0,
+			"tick": 660
+		},
+		{
+			"alive": [
+				65,
+				18
+			],
+			"hp": [
+				2769,
+				1595
+			],
+			"seconds": 34.0,
+			"tick": 680
+		},
+		{
+			"alive": [
+				65,
+				17
+			],
+			"hp": [
+				2721,
+				1570
+			],
+			"seconds": 35.0,
+			"tick": 700
+		},
+		{
+			"alive": [
+				63,
+				17
+			],
+			"hp": [
+				2631,
+				1525
+			],
+			"seconds": 36.0,
+			"tick": 720
+		},
+		{
+			"alive": [
+				63,
+				17
+			],
+			"hp": [
+				2595,
+				1500
+			],
+			"seconds": 37.0,
+			"tick": 740
+		},
+		{
+			"alive": [
+				59,
+				17
+			],
+			"hp": [
+				2523,
+				1455
+			],
+			"seconds": 38.0,
+			"tick": 760
+		},
+		{
+			"alive": [
+				58,
+				16
+			],
+			"hp": [
+				2478,
+				1435
+			],
+			"seconds": 39.0,
+			"tick": 780
+		},
+		{
+			"alive": [
+				58,
+				15
+			],
+			"hp": [
+				2406,
+				1395
+			],
+			"seconds": 40.0,
+			"tick": 800
+		},
+		{
+			"alive": [
+				56,
+				15
+			],
+			"hp": [
+				2352,
+				1370
+			],
+			"seconds": 41.0,
+			"tick": 820
+		},
+		{
+			"alive": [
+				53,
+				14
+			],
+			"hp": [
+				2289,
+				1325
+			],
+			"seconds": 42.0,
+			"tick": 840
+		},
+		{
+			"alive": [
+				52,
+				14
+			],
+			"hp": [
+				2232,
+				1300
+			],
+			"seconds": 43.0,
+			"tick": 860
+		},
+		{
+			"alive": [
+				52,
+				13
+			],
+			"hp": [
+				2172,
+				1255
+			],
+			"seconds": 44.0,
+			"tick": 880
+		},
+		{
+			"alive": [
+				52,
+				12
+			],
+			"hp": [
+				2088,
+				1235
+			],
+			"seconds": 45.0,
+			"tick": 900
+		},
+		{
+			"alive": [
+				52,
+				12
+			],
+			"hp": [
+				2052,
+				1190
+			],
+			"seconds": 46.0,
+			"tick": 920
+		},
+		{
+			"alive": [
+				50,
+				12
+			],
+			"hp": [
+				1986,
+				1170
+			],
+			"seconds": 47.0,
+			"tick": 940
+		},
+		{
+			"alive": [
+				50,
+				11
+			],
+			"hp": [
+				1938,
+				1130
+			],
+			"seconds": 48.0,
+			"tick": 960
+		},
+		{
+			"alive": [
+				47,
+				11
+			],
+			"hp": [
+				1887,
+				1105
+			],
+			"seconds": 49.0,
+			"tick": 980
+		},
+		{
+			"alive": [
+				43,
+				11
+			],
+			"hp": [
+				1839,
+				1065
+			],
+			"seconds": 50.0,
+			"tick": 1000
+		},
+		{
+			"alive": [
+				41,
+				11
+			],
+			"hp": [
+				1785,
+				1045
+			],
+			"seconds": 51.0,
+			"tick": 1020
+		},
+		{
+			"alive": [
+				41,
+				11
+			],
+			"hp": [
+				1749,
+				1015
+			],
+			"seconds": 52.0,
+			"tick": 1040
+		},
+		{
+			"alive": [
+				40,
+				11
+			],
+			"hp": [
+				1692,
+				990
+			],
+			"seconds": 53.0,
+			"tick": 1060
+		},
+		{
+			"alive": [
+				38,
+				11
+			],
+			"hp": [
+				1638,
+				955
+			],
+			"seconds": 54.0,
+			"tick": 1080
+		},
+		{
+			"alive": [
+				38,
+				10
+			],
+			"hp": [
+				1590,
+				925
+			],
+			"seconds": 55.0,
+			"tick": 1100
+		},
+		{
+			"alive": [
+				37,
+				10
+			],
+			"hp": [
+				1545,
+				900
+			],
+			"seconds": 56.0,
+			"tick": 1120
+		},
+		{
+			"alive": [
+				35,
+				10
+			],
+			"hp": [
+				1491,
+				865
+			],
+			"seconds": 57.0,
+			"tick": 1140
+		},
+		{
+			"alive": [
+				35,
+				10
+			],
+			"hp": [
+				1443,
+				850
+			],
+			"seconds": 58.0,
+			"tick": 1160
+		},
+		{
+			"alive": [
+				35,
+				10
+			],
+			"hp": [
+				1383,
+				815
+			],
+			"seconds": 59.0,
+			"tick": 1180
+		},
+		{
+			"alive": [
+				34,
+				10
+			],
+			"hp": [
+				1326,
+				795
+			],
+			"seconds": 60.0,
+			"tick": 1200
+		},
+		{
+			"alive": [
+				32,
+				10
+			],
+			"hp": [
+				1296,
+				760
+			],
+			"seconds": 61.0,
+			"tick": 1220
+		},
+		{
+			"alive": [
+				29,
+				10
+			],
+			"hp": [
+				1233,
+				745
+			],
+			"seconds": 62.0,
+			"tick": 1240
+		},
+		{
+			"alive": [
+				28,
+				10
+			],
+			"hp": [
+				1188,
+				715
+			],
+			"seconds": 63.0,
+			"tick": 1260
+		},
+		{
+			"alive": [
+				27,
+				10
+			],
+			"hp": [
+				1143,
+				700
+			],
+			"seconds": 64.0,
+			"tick": 1280
+		},
+		{
+			"alive": [
+				26,
+				10
+			],
+			"hp": [
+				1098,
+				665
+			],
+			"seconds": 65.0,
+			"tick": 1300
+		},
+		{
+			"alive": [
+				25,
+				10
+			],
+			"hp": [
+				1041,
+				650
+			],
+			"seconds": 66.0,
+			"tick": 1320
+		},
+		{
+			"alive": [
+				24,
+				10
+			],
+			"hp": [
+				996,
+				620
+			],
+			"seconds": 67.0,
+			"tick": 1340
+		},
+		{
+			"alive": [
+				23,
+				10
+			],
+			"hp": [
+				939,
+				605
+			],
+			"seconds": 68.0,
+			"tick": 1360
+		},
+		{
+			"alive": [
+				22,
+				10
+			],
+			"hp": [
+				882,
+				575
+			],
+			"seconds": 69.0,
+			"tick": 1380
+		},
+		{
+			"alive": [
+				21,
+				9
+			],
+			"hp": [
+				837,
+				560
+			],
+			"seconds": 70.0,
+			"tick": 1400
+		},
+		{
+			"alive": [
+				20,
+				9
+			],
+			"hp": [
+				780,
+				535
+			],
+			"seconds": 71.0,
+			"tick": 1420
+		},
+		{
+			"alive": [
+				17,
+				8
+			],
+			"hp": [
+				729,
+				505
+			],
+			"seconds": 72.0,
+			"tick": 1440
+		},
+		{
+			"alive": [
+				17,
+				8
+			],
+			"hp": [
+				705,
+				485
+			],
+			"seconds": 73.0,
+			"tick": 1460
+		},
+		{
+			"alive": [
+				17,
+				8
+			],
+			"hp": [
+				645,
+				465
+			],
+			"seconds": 74.0,
+			"tick": 1480
+		},
+		{
+			"alive": [
+				16,
+				8
+			],
+			"hp": [
+				600,
+				445
+			],
+			"seconds": 75.0,
+			"tick": 1500
+		},
+		{
+			"alive": [
+				14,
+				8
+			],
+			"hp": [
+				570,
+				420
+			],
+			"seconds": 76.0,
+			"tick": 1520
+		},
+		{
+			"alive": [
+				13,
+				8
+			],
+			"hp": [
+				513,
+				405
+			],
+			"seconds": 77.0,
+			"tick": 1540
+		},
+		{
+			"alive": [
+				13,
+				7
+			],
+			"hp": [
+				489,
+				380
+			],
+			"seconds": 78.0,
+			"tick": 1560
+		},
+		{
+			"alive": [
+				12,
+				7
+			],
+			"hp": [
+				432,
+				370
+			],
+			"seconds": 79.0,
+			"tick": 1580
+		},
+		{
+			"alive": [
+				10,
+				7
+			],
+			"hp": [
+				402,
+				350
+			],
+			"seconds": 80.0,
+			"tick": 1600
+		},
+		{
+			"alive": [
+				10,
+				7
+			],
+			"hp": [
+				354,
+				335
+			],
+			"seconds": 81.0,
+			"tick": 1620
+		},
+		{
+			"alive": [
+				9,
+				7
+			],
+			"hp": [
+				333,
+				320
+			],
+			"seconds": 82.0,
+			"tick": 1640
+		},
+		{
+			"alive": [
+				8,
+				7
+			],
+			"hp": [
+				300,
+				295
+			],
+			"seconds": 83.0,
+			"tick": 1660
+		},
+		{
+			"alive": [
+				8,
+				7
+			],
+			"hp": [
+				252,
+				290
+			],
+			"seconds": 84.0,
+			"tick": 1680
+		},
+		{
+			"alive": [
+				8,
+				7
+			],
+			"hp": [
+				240,
+				265
+			],
+			"seconds": 85.0,
+			"tick": 1700
+		},
+		{
+			"alive": [
+				7,
+				7
+			],
+			"hp": [
+				207,
+				260
+			],
+			"seconds": 86.0,
+			"tick": 1720
+		},
+		{
+			"alive": [
+				4,
+				6
+			],
+			"hp": [
+				180,
+				235
+			],
+			"seconds": 87.0,
+			"tick": 1740
+		},
+		{
+			"alive": [
+				4,
+				6
+			],
+			"hp": [
+				132,
+				230
+			],
+			"seconds": 88.0,
+			"tick": 1760
+		},
+		{
+			"alive": [
+				4,
+				6
+			],
+			"hp": [
+				108,
+				215
+			],
+			"seconds": 89.0,
+			"tick": 1780
+		},
+		{
+			"alive": [
+				3,
+				6
+			],
+			"hp": [
+				75,
+				210
+			],
+			"seconds": 90.0,
+			"tick": 1800
+		},
+		{
+			"alive": [
+				3,
+				6
+			],
+			"hp": [
+				51,
+				200
+			],
+			"seconds": 91.0,
+			"tick": 1820
+		},
+		{
+			"alive": [
+				2,
+				6
+			],
+			"hp": [
+				18,
+				195
+			],
+			"seconds": 92.0,
+			"tick": 1840
+		},
+		{
+			"alive": [
+				0,
+				6
+			],
+			"hp": [
+				0,
+				190
+			],
+			"seconds": 92.4500000000000028,
+			"tick": 1849
+		}
+	],
+	"timing": {
+		"measured_speed": 9.99333273376940134,
+		"mode": "paced",
+		"requested_speed": 10.0,
+		"wall_seconds": 9.25116799999999984
+	},
+	"winner_team": 1
+}

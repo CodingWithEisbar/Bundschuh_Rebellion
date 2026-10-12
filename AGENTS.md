@@ -1,11 +1,25 @@
 # Repository guidance
 
 This is the Godot 4.5.2 Standard / typed GDScript RTS prototype: Stage 1 playable
-economy/navigation, Stage 2 combat, Stage 3 maps/missions and Stage 4 presentation.
+economy/navigation, Stage 2 combat, Stage 3 maps/missions, Stage 4 presentation
+and Stage 5 data-driven balance tools.
 
 ## Before changing gameplay
 
 - Read README.md and docs/STAGE_1_ARCHITECTURE.md.
+- For unit stats/reload/arena work read docs/STAGE_5_BALANCE.md. JSON is the sole
+  combat base-stat source. Keep Python and Godot validators on the shared schema;
+  reject invalid candidates atomically and retain the last good revision.
+- Heavy Gendarme maps to base Armoured Ritter (125 HP), not the Elite tier.
+  Preserve Phase 2 base costs and explicit Stage 2 counter/aura overrides.
+- Spawned units retain their stat/cost/HP/cooldown snapshot. Arena runs pin a
+  whole revision; watch starts a new fight after valid reload, never mixes stats.
+- Use real CombatWorld for simulations. Keep 20 Hz ticks at 10x; report measured
+  wall speed separately. Do not duplicate combat math in the Python launcher.
+- Keep report folders out of Godot asset import (CSV otherwise becomes a
+  translation asset). Do not hide source folders to achieve this.
+- A closed flat arena with swept-circle steering is not general military
+  pathfinding, an equal-resource test or proof of ranked faction balance.
 - For combat also read docs/STAGE_2_COMBAT.md. Its explicit Stage 2 rules supersede
   the older GDD's aura/payroll tuning for this opt-in backend only.
 - For map/height/stealth changes also read docs/STAGE_3_MAPS_MISSIONS.md.
