@@ -31,6 +31,16 @@ var modifiers := CombatStatModifiers.new()
 # Recovery is measured in BASE attack seconds. A rate change affects remaining
 # recovery immediately without resetting a swing or granting a free extra hit.
 var recovery_work: float = 0.0
+# Optional Stage 4 wind-up, expressed as a fraction of the base attack cycle.
+# Legacy fixtures keep 0. Animation samples these authoritative work counters;
+# a culled, paused or missing sprite can never prevent simulation damage.
+var impact_fraction: float = 0.0
+var attack_serial: int = 0
+var attack_cycle_work: float = 0.0
+var attack_elapsed_work: float = 0.0
+var attack_impact_work: float = 0.0
+var swing_pending: bool = false
+var swing_cancelled: bool = false
 
 
 func _init(entity_id: int, owner: int, team: int, side: int,

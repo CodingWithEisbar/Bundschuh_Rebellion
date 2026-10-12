@@ -6,6 +6,8 @@ extends RefCounted
 ## Command/event consumers operate on IDs; this model never retains a UI Node.
 
 signal hit_resolved(event: Dictionary)
+signal attack_started(event: Dictionary)
+signal attack_cancelled(event: Dictionary)
 signal unit_died(event: Dictionary)
 signal payroll_settled(event: Dictionary)
 signal desertion_event(event: Dictionary)
@@ -30,6 +32,18 @@ var _advancing: bool = false
 var _orders: Dictionary = {} # attacker ID -> target ID; only active orders tick.
 var _events: Array[Dictionary] = []
 var _terrain: WorldGrid
+
+
+func set_attack_timing(id: int, impact_fraction: float) -> bool:
+	## Set at spawn from the validated animation profile's impact marker.
+	## Never retime an in-flight swing when a visual asset changes.
+	if _advancing or not units.has(id) or not is_finite(impact_fraction) or impact_fraction < 0.0 or impact_fraction >= 1.0:
+		return false
+	var unit: CombatUnit = units[id]
+	if unit.swing_pending or unit.recovery_work > 0.000001:
+		return false
+	unit.impact_fraction = impact_fraction
+	return true
 
 
 func bind_terrain(terrain: WorldGrid) -> bool:
@@ -143,6 +157,8 @@ func command_attack(owner: int, attacker_id: int, target_id: int) -> bool:
 		return false
 	if not are_enemies(attacker, target):
 		return false
+	if _orders.has(attacker_id) and int(_orders[attacker_id]) != target_id:
+		_cancel_swing(attacker_id)
 	_orders[attacker_id] = target_id
 	return true
 
@@ -151,6 +167,7 @@ func command_stop(owner: int, id: int) -> bool:
 	if _advancing or owner < 0 or not units.has(id) or units[id].owner_id != owner:
 		return false
 	_orders.erase(id)
+	_cancel_swing(id)
 	# Recovery is NOT reset. Spamming Stop/Attack cannot bypass attack speed.
 	return true
 
@@ -179,7 +196,9 @@ func _tick() -> void:
 	# Account for the elapsed interval using its previous modifier. Membership
 	# changes at this tick affect the FOLLOWING interval, not past recovery.
 	for unit: CombatUnit in units.values():
-		unit.recovery_work = maxf(0.0, unit.recovery_work - FIXED_DT * unit.modifiers.attack_rate)
+		var work := FIXED_DT * unit.modifiers.attack_rate
+		unit.recovery_work = maxf(0.0, unit.recovery_work - work)
+		unit.attack_elapsed_work = minf(unit.attack_cycle_work, unit.attack_elapsed_work + work)
 	_run_payroll()
 	if tick_count % AURA_TICKS == 0:
 		spatial.rebuild(units)
@@ -237,9 +256,12 @@ func _acquire_mutineer_targets() -> void:
 				best = candidate
 				best_distance = distance
 		if best != null:
+			if _orders.has(unit.id) and int(_orders[unit.id]) != best.id:
+				_cancel_swing(unit.id)
 			_orders[unit.id] = best.id
 		else:
 			_orders.erase(unit.id)
+			_cancel_swing(unit.id)
 
 
 func _resolve_attacks() -> void:
@@ -254,22 +276,40 @@ func _resolve_attacks() -> void:
 		var target: CombatUnit = units.get(_orders[id])
 		if attacker == null or target == null or not attacker.can_attack() or not target.alive() or not target.on_field:
 			_orders.erase(id)
+			_cancel_swing(id)
 			continue
 		if not are_enemies(attacker, target):
 			_orders.erase(id)
+			_cancel_swing(id)
 			continue
-		if attacker.recovery_work > 0.000001 or not in_weapon_range(attacker, target):
+		if not in_weapon_range(attacker, target):
+			_cancel_swing(id)
 			continue
+		if not attacker.swing_pending:
+			if attacker.recovery_work > 0.000001:
+				continue
+			attacker.attack_serial += 1
+			attacker.attack_cycle_work = attacker.base_attack_period
+			attacker.attack_elapsed_work = 0.0
+			attacker.attack_impact_work = attacker.base_attack_period * attacker.impact_fraction
+			attacker.recovery_work = attacker.base_attack_period
+			attacker.swing_pending = true
+			attacker.swing_cancelled = false
+			_events.append({"type": "attack_started", "data": {
+				"attacker_id": id, "target_id": target.id, "serial": attacker.attack_serial,
+				"tick": tick_count, "impact_fraction": attacker.impact_fraction}})
+		if attacker.attack_elapsed_work < attacker.attack_impact_work - 0.000001:
+			continue
+		attacker.swing_pending = false # Consume once, before damage/events.
 		# Sample both physical centers at the hit, including terrain edits since
 		# the last movement event. Never sample a reserved navigation endpoint.
 		_sample_elevation(attacker)
 		_sample_elevation(target)
 		var result := DamageCalculator.calculate(attacker, target)
 		var damage := int(result["total"])
-		hits.append({"attacker_id": id, "target_id": target.id, "damage": damage,
+		hits.append({"attacker_id": id, "target_id": target.id, "damage": damage, "serial": attacker.attack_serial,
 			"breakdown": result, "tick": tick_count})
 		damage_by_target[target.id] = int(damage_by_target.get(target.id, 0)) + damage
-		attacker.recovery_work = attacker.base_attack_period
 		attacks_resolved += 1
 	var killed: Array[int] = []
 	for id: int in damage_by_target:
@@ -301,9 +341,23 @@ func _remove(id: int) -> void:
 
 func _clear_orders_involving(id: int) -> void:
 	_orders.erase(id)
+	_cancel_swing(id)
 	for attacker: int in _orders.keys():
 		if int(_orders[attacker]) == id:
 			_orders.erase(attacker)
+			_cancel_swing(attacker)
+
+
+func _cancel_swing(id: int) -> void:
+	var unit: CombatUnit = units.get(id)
+	if unit == null:
+		return
+	if unit.swing_pending:
+		_events.append({"type": "attack_cancelled", "data": {
+			"attacker_id": id, "serial": unit.attack_serial, "tick": tick_count}})
+	unit.swing_pending = false
+	unit.swing_cancelled = true
+	# Keep remaining recovery. Stop/retarget/range loss cannot farm free swings.
 
 
 func _emit_events() -> void:
@@ -312,6 +366,8 @@ func _emit_events() -> void:
 	for event in _events:
 		var data: Dictionary = event["data"].duplicate(true)
 		match event["type"]:
+			"attack_started": attack_started.emit(data)
+			"attack_cancelled": attack_cancelled.emit(data)
 			"hit": hit_resolved.emit(data)
 			"death": unit_died.emit(data)
 			"payroll": payroll_settled.emit(data)

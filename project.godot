@@ -1,8 +1,8 @@
-; Godot 4.5.2 standard build (GDScript); no external addons or imported assets.
+; Godot 4.5.2 standard build (GDScript); original placeholder atlases, no addons.
 config_version=5
 
 [application]
-config/name="Bundschuh: Rebellion — Stage 1"
+config/name="Bundschuh: Rebellion — Stage 4"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 

@@ -3,6 +3,7 @@
 **Stage 1 — Core RTS Prototype & Pathfinding**
 **Stage 2 — Combat Matrix & Asymmetrical Mechanics (backend)**
 **Stage 3 — Procedural Maps, High Ground & Mission Triggers**
+**Stage 4 — Asset Integration, Animation & Audio**
 Engine được ghim: **Godot 4.5.2 Standard**, GDScript có kiểu dữ liệu. Mở project và chạy ngay, không cần .NET, asset pack hoặc plugin trả phí.
 
 Đây là nền prototype có mã nguồn, scene điều khiển và regression tests. Presentation hiện là top-down greybox để kiểm tra gameplay; hướng isometric sprite và art/audio của GDD Phase 4 sẽ được áp dụng ở giai đoạn nội dung.
@@ -40,6 +41,7 @@ Không cần export templates để chạy bằng editor. Repo không chứa bin
 | Stealth backend | Joß Fritz, thanh detection, fail sau 3 episode; Area2D adapter và events, cấu hình qua Resource |
 | Drop-offs | Town Center nhận cả bốn loại; Mill nhận Food; Lumber Camp nhận Wood; Mining Camp nhận Gold/Stone |
 | HUD & input | Chọn/kéo chọn/Shift, lệnh theo ngữ cảnh, minimap, camera, pause, tốc độ 1×/4×, progress/HP/cargo |
+| Animation/audio lab | F9: Idle/Run/Attack/Die, wind-up/contact đồng bộ, adaptive music, voice routing theo phe, caption và pool |
 | Verification | Tests chạy bằng Godot thật; kiểm tra 200 quân qua choke một ô, đi ngược chiều, bảo toàn tài nguyên và construction |
 
 ## Điều khiển
@@ -61,8 +63,9 @@ Không cần export templates để chạy bằng editor. Repo không chứa bin
 | Reset sandbox 16 dân | F6 |
 | Reset stress scenario 200 dân | F7 — tự ra lệnh vượt đường rừng |
 | Tạo Black Forest theo seed | Nhập ô seed → F8 / nút Forest / Enter |
+| Animation & Audio Lab | F9; F6 trở về sandbox mới |
 
-F6/F7/F8 **reset toàn bộ sandbox hiện tại**. Demo cấp sẵn tài nguyên và housing để thử hệ thống; đây không phải opening skirmish tiêu chuẩn trong GDD. Chưa có lưu game.
+F6/F7/F8 **reset toàn bộ sandbox hiện tại**. F9 đổi sang scene lab và cũng bỏ tiến độ sandbox. Demo cấp sẵn tài nguyên và housing để thử hệ thống; đây không phải opening skirmish tiêu chuẩn trong GDD. Chưa có lưu game.
 
 ## Thử ba vòng gameplay
 
@@ -84,7 +87,7 @@ Linux/macOS:
 
     python3 tools/verify.py --godot /path/to/godot
 
-Lệnh thực hiện import/compile, regression tests cả ba stage, hai backend demo, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json**, **stage2.json** và **stage3.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
+Lệnh thực hiện import/compile, regression tests cả bốn stage, ba demo tích hợp, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json**, **stage2.json**, **stage3.json** và **stage4.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
 
 CI tương ứng: [.github/workflows/godot.yml](.github/workflows/godot.yml). Workflow ghim engine và checksum, chỉ cần quyền đọc nội dung repo.
 
@@ -118,6 +121,24 @@ Demo in thông tin map, đòn Pike từ **27 → 34 damage** khi đứng cao hơ
 collider và các luật mới thay GDD cũ. Combat/stealth hiện là backend; F8 chưa phải
 campaign có guard patrol hoặc quân chiến đấu điều khiển được.
 
+## Thử Stage 4
+
+Nhấn **F9** từ sandbox để mở phòng thử animation/audio: chọn phe → Preview Run →
+Attack; thử Rate +15%, Idle, Preview Die và Space. Khi 12 unit giao tranh trong
+viewport, nhạc crossfade sang Combat. Phụ đề cho biết câu được chọn theo phe.
+
+    godot --headless --path . --script examples/stage4_backend_demo.gd
+
+Asset hiện tại là **sprite hình học và âm tổng hợp kiểm thử**. Chưa có bản thu
+lute/chorale hoặc giọng Frühneuhochdeutsch thật. Các câu tiếng Đức là draft casting
+hiện đại hóa, chưa thẩm định lịch sử. Code có sẵn bank/stream slots để thay bằng
+asset production. [Stage 4 guide](docs/STAGE_4_ASSETS_AUDIO.md) giải thích tạo
+SpriteFrames, hit marker, crossfade, voice events, async loading và pooling.
+
+Wind-up là tùy chọn theo unit; lab bật, các fixture Stage 2/3 cũ giữ marker 0 để
+tương thích. Animation đọc simulation, không tự gây damage. Run trong lab là
+preview tại chỗ; military navigation và art toàn bộ sandbox chưa nằm trong stage.
+
 ## Tổ chức source
 
 | Đường dẫn | Trách nhiệm |
@@ -131,6 +152,10 @@ campaign có guard patrol hoặc quân chiến đấu điều khiển được.
 | [scripts/maps](scripts/maps) | Recipe, seeded generator, validation và playable factory |
 | [scripts/missions](scripts/missions) | Mission state, exposure/counts và Area2D LOS adapter |
 | [data](data) | Map/mission Resources chỉnh qua Inspector |
+| [scripts/animation](scripts/animation) | Shared animation profiles, state controller và pool 200 views |
+| [scripts/audio](scripts/audio) | Music director, synchronized crossfade, voice selector/router và player pool |
+| [scripts/assets](scripts/assets) | Threaded asset scope và diagnostic asset factory |
+| [scenes/stage4_lab.tscn](scenes/stage4_lab.tscn) | Phòng thử tích hợp F9 |
 | [scripts/presentation](scripts/presentation) | Input, greybox renderer, minimap, HUD |
 | [tests/run_tests.gd](tests/run_tests.gd) | Integration tests dùng chính model của game |
 | [tests/combat_tests.gd](tests/combat_tests.gd) | Combat/aura/payroll regression và mass-battle benchmark |
@@ -143,6 +168,10 @@ campaign có guard patrol hoặc quân chiến đấu điều khiển được.
 | [examples/stage3_backend_demo.gd](examples/stage3_backend_demo.gd) | Seeded map, high-ground hit và ba detection episodes |
 | [docs/STAGE_3_MAPS_MISSIONS.md](docs/STAGE_3_MAPS_MISSIONS.md) | Cấu hình, thuật toán, integration và phạm vi Stage 3 |
 | [docs/STAGE_3_VALIDATION.md](docs/STAGE_3_VALIDATION.md) | Kết quả kiểm thử ba stage và giới hạn đo đạc |
+| [tests/stage4_tests.gd](tests/stage4_tests.gd) | Wind-up/animation/audio/voice/pool và scene regressions |
+| [examples/stage4_backend_demo.gd](examples/stage4_backend_demo.gd) | Demo tích hợp nhanh qua CLI |
+| [docs/STAGE_4_ASSETS_AUDIO.md](docs/STAGE_4_ASSETS_AUDIO.md) | Asset contracts, API, artist/audio workflow |
+| [docs/STAGE_4_VALIDATION.md](docs/STAGE_4_VALIDATION.md) | Kết quả kiểm thử và giới hạn headless |
 | [docs/gdd](docs/gdd) | Bốn phase thiết kế làm nền cho các stage tiếp theo |
 | [AGENTS.md](AGENTS.md) | Quy tắc thay đổi source cho người và AI agent |
 

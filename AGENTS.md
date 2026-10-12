@@ -1,7 +1,7 @@
 # Repository guidance
 
 This is the Godot 4.5.2 Standard / typed GDScript RTS prototype: Stage 1 playable
-economy/navigation, Stage 2 combat backend and Stage 3 maps/mission triggers.
+economy/navigation, Stage 2 combat, Stage 3 maps/missions and Stage 4 presentation.
 
 ## Before changing gameplay
 
@@ -18,6 +18,15 @@ economy/navigation, Stage 2 combat backend and Stage 3 maps/mission triggers.
 - Stealth takes the union of enemy guard sightings, with one clock, full unseen
   rearming and a one-shot terminal result. LOS Areas are authored volumes, not
   terrain-occluding vision. Map choice must not auto-enable campaign systems.
+- For animation/audio read docs/STAGE_4_ASSETS_AUDIO.md. Simulation owns impact:
+  sprites must never apply damage. Wind-up is opt-in (default marker 0); preserve
+  full attack-period cadence, cancellation cooldown and simultaneous hit batches.
+- Music counts distinct recent, permitted, on-camera living participants, not hit
+  event volume. More than 10 means at least 11. Filter visibility before recording.
+- No load/instantiate in unit feedback or hit handlers. Compile shared profiles
+  and prewarm pools during loading. Release unit/texture/stream references on reuse.
+- Shipped audio is diagnostic synthesis, not historical instruments or recorded
+  German. Draft casting text is not certified Frühneuhochdeutsch. Keep this clear.
 - Consult the relevant docs/gdd phase for costs, faction rules and future scope.
 - Keep simulation models independent from Node/UI APIs. Inject the world/services;
   do not introduce global scene-tree lookups inside workers.

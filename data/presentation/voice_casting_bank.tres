@@ -1,0 +1,172 @@
+[gd_resource type="Resource" script_class="RtsAudioBank" load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/rts_audio_bank.gd" id="1"]
+
+[ext_resource type="Script" path="res://scripts/audio/voice_line.gd" id="2"]
+
+
+[sub_resource type="Resource" id="voice_0_selected_0"]
+script = ExtResource("2")
+id = &"voice_0_selected_0"
+faction = 0
+action = "selected"
+text_de = "Wir hören."
+subtitle_vi = "Chúng tôi đang nghe."
+
+
+[sub_resource type="Resource" id="voice_0_selected_1"]
+script = ExtResource("2")
+id = &"voice_0_selected_1"
+faction = 0
+action = "selected"
+text_de = "Was ist zu tun?"
+subtitle_vi = "Cần làm gì?"
+
+
+[sub_resource type="Resource" id="voice_0_selected_2"]
+script = ExtResource("2")
+id = &"voice_0_selected_2"
+faction = 0
+action = "selected"
+text_de = "Hier bin ich."
+subtitle_vi = "Tôi ở đây."
+
+
+[sub_resource type="Resource" id="voice_0_move_0"]
+script = ExtResource("2")
+id = &"voice_0_move_0"
+faction = 0
+action = "move"
+text_de = "Wohlan!"
+subtitle_vi = "Nào!"
+
+
+[sub_resource type="Resource" id="voice_0_move_1"]
+script = ExtResource("2")
+id = &"voice_0_move_1"
+faction = 0
+action = "move"
+text_de = "Ich geh voran."
+subtitle_vi = "Tôi đi trước."
+
+
+[sub_resource type="Resource" id="voice_0_move_2"]
+script = ExtResource("2")
+id = &"voice_0_move_2"
+faction = 0
+action = "move"
+text_de = "Dorthin."
+subtitle_vi = "Đến đó."
+
+
+[sub_resource type="Resource" id="voice_0_attack_0"]
+script = ExtResource("2")
+id = &"voice_0_attack_0"
+faction = 0
+action = "attack"
+text_de = "Für unser Recht!"
+subtitle_vi = "Vì quyền của chúng ta!"
+
+
+[sub_resource type="Resource" id="voice_0_attack_1"]
+script = ExtResource("2")
+id = &"voice_0_attack_1"
+faction = 0
+action = "attack"
+text_de = "Haltet zusammen!"
+subtitle_vi = "Giữ cùng nhau!"
+
+
+[sub_resource type="Resource" id="voice_0_attack_2"]
+script = ExtResource("2")
+id = &"voice_0_attack_2"
+faction = 0
+action = "attack"
+text_de = "Weicht nicht!"
+subtitle_vi = "Đừng lùi!"
+
+
+[sub_resource type="Resource" id="voice_1_selected_0"]
+script = ExtResource("2")
+id = &"voice_1_selected_0"
+faction = 1
+action = "selected"
+text_de = "Zu Diensten."
+subtitle_vi = "Sẵn sàng phục vụ."
+
+
+[sub_resource type="Resource" id="voice_1_selected_1"]
+script = ExtResource("2")
+id = &"voice_1_selected_1"
+faction = 1
+action = "selected"
+text_de = "Euer Befehl?"
+subtitle_vi = "Lệnh của ngài?"
+
+
+[sub_resource type="Resource" id="voice_1_selected_2"]
+script = ExtResource("2")
+id = &"voice_1_selected_2"
+faction = 1
+action = "selected"
+text_de = "Wir sind bereit."
+subtitle_vi = "Chúng tôi sẵn sàng."
+
+
+[sub_resource type="Resource" id="voice_1_move_0"]
+script = ExtResource("2")
+id = &"voice_1_move_0"
+faction = 1
+action = "move"
+text_de = "Wie befohlen."
+subtitle_vi = "Theo lệnh."
+
+
+[sub_resource type="Resource" id="voice_1_move_1"]
+script = ExtResource("2")
+id = &"voice_1_move_1"
+faction = 1
+action = "move"
+text_de = "Wir ziehen weiter."
+subtitle_vi = "Chúng ta tiếp tục."
+
+
+[sub_resource type="Resource" id="voice_1_move_2"]
+script = ExtResource("2")
+id = &"voice_1_move_2"
+faction = 1
+action = "move"
+text_de = "Vorwärts."
+subtitle_vi = "Tiến lên."
+
+
+[sub_resource type="Resource" id="voice_1_attack_0"]
+script = ExtResource("2")
+id = &"voice_1_attack_0"
+faction = 1
+action = "attack"
+text_de = "Für den Bund!"
+subtitle_vi = "Vì Liên minh!"
+
+
+[sub_resource type="Resource" id="voice_1_attack_1"]
+script = ExtResource("2")
+id = &"voice_1_attack_1"
+faction = 1
+action = "attack"
+text_de = "Mit mir!"
+subtitle_vi = "Theo ta!"
+
+
+[sub_resource type="Resource" id="voice_1_attack_2"]
+script = ExtResource("2")
+id = &"voice_1_attack_2"
+faction = 1
+action = "attack"
+text_de = "Auf sie!"
+subtitle_vi = "Đánh chúng!"
+
+
+[resource]
+script = ExtResource("1")
+voices = Array[ExtResource("2")]([SubResource("voice_0_selected_0"), SubResource("voice_0_selected_1"), SubResource("voice_0_selected_2"), SubResource("voice_0_move_0"), SubResource("voice_0_move_1"), SubResource("voice_0_move_2"), SubResource("voice_0_attack_0"), SubResource("voice_0_attack_1"), SubResource("voice_0_attack_2"), SubResource("voice_1_selected_0"), SubResource("voice_1_selected_1"), SubResource("voice_1_selected_2"), SubResource("voice_1_move_0"), SubResource("voice_1_move_1"), SubResource("voice_1_move_2"), SubResource("voice_1_attack_0"), SubResource("voice_1_attack_1"), SubResource("voice_1_attack_2")])

@@ -132,11 +132,11 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		# Text entry owns Ctrl+A, Space and letter keys while the seed is focused.
-		if seed_input.has_focus() and event.keycode not in [KEY_ESCAPE, KEY_F8]:
+		if seed_input.has_focus() and event.keycode not in [KEY_ESCAPE, KEY_F8, KEY_F9]:
 			return
 		# RTS shortcuts take precedence over a focused button's ui_accept.
 		# Space must pause, not accidentally activate the last clicked button.
-		if event.keycode in [KEY_ESCAPE, KEY_SPACE, KEY_X, KEY_TAB, KEY_F6, KEY_F7, KEY_F8, KEY_H, KEY_J, KEY_K, KEY_L] or (event.keycode == KEY_A and event.ctrl_pressed):
+		if event.keycode in [KEY_ESCAPE, KEY_SPACE, KEY_X, KEY_TAB, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_H, KEY_J, KEY_K, KEY_L] or (event.keycode == KEY_A and event.ctrl_pressed):
 			_unhandled_input(event)
 			get_viewport().set_input_as_handled()
 
@@ -145,7 +145,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if world == null:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
-		if seed_input.has_focus() and event.keycode not in [KEY_ESCAPE, KEY_F8]:
+		if seed_input.has_focus() and event.keycode not in [KEY_ESCAPE, KEY_F8, KEY_F9]:
 			return
 		if event.keycode == KEY_ESCAPE:
 			seed_input.release_focus()
@@ -166,6 +166,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_reset(true)
 		elif event.keycode == KEY_F8:
 			_reset_forest()
+		elif event.keycode == KEY_F9:
+			get_tree().call_deferred("change_scene_to_file", "res://scenes/stage4_lab.tscn")
 		elif event.keycode in [KEY_H, KEY_J, KEY_K, KEY_L]:
 			var bindings := {KEY_H: "house", KEY_J: "mill", KEY_K: "lumber_camp", KEY_L: "mining_camp"}
 			_begin_placement(bindings[event.keycode])
@@ -322,7 +324,7 @@ func _build_hud() -> void:
 	var top_row := HBoxContainer.new()
 	top_row.add_theme_constant_override("separation", 22)
 	top.add_child(top_row)
-	var title := _label("BUNDSCHUH  /  STAGE 3", 18, Color("#dfc38c"))
+	var title := _label("BUNDSCHUH  /  STAGE 4", 18, Color("#dfc38c"))
 	top_row.add_child(title)
 	for kind in ResourceKind.Type.values():
 		var label := _label("", 17, ResourceKind.COLORS[kind])
@@ -389,7 +391,7 @@ func _build_hud() -> void:
 	seed_input.tooltip_text = "Black Forest seed. Enter or F8 regenerates the sandbox."
 	seed_input.text_submitted.connect(func(_text: String) -> void: _reset_forest())
 	scenarios.add_child(seed_input)
-	actions.add_child(_label("Sandbox · reset clears current progress", 13, Color("#9caaac")))
+	actions.add_child(_label("F9: animation/audio lab · resets current map", 13, Color("#9caaac")))
 
 
 func _panel() -> PanelContainer:

@@ -8,6 +8,9 @@ Engine: **Godot 4.5.2 Standard**, typed GDScript. Đây là backend chạy đư�
 Godot thật, nối với clock và ResourceBank của Stage 1. F5/F6/F7 vẫn là scene thử
 economy/navigation; Stage 2 chưa thêm giao diện điều khiển quân chiến đấu.
 
+> Stage 4 thêm wind-up tùy chọn và `attack_started`/`attack_cancelled`; xem
+> [Stage 4 guide](STAGE_4_ASSETS_AUDIO.md). Marker mặc định 0 giữ fixture này.
+
 ## 1. Luật Stage 2 và quan hệ với GDD
 
 Yêu cầu triển khai Stage 2 mới nhất là nguồn quyết định cho các hàng dưới.
