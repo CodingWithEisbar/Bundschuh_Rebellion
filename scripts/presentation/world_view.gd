@@ -32,6 +32,8 @@ func _draw() -> void:
 		for x in range(model.grid.size.x):
 			var cell := Vector2i(x, y)
 			var rect := Rect2(Vector2(cell) * CELL, Vector2.ONE * CELL)
+			if model.grid.height_at(cell) > 0:
+				draw_rect(rect, Color(0.72, 0.70, 0.40, 0.07 * model.grid.height_at(cell)))
 			if (x + y) % 2 == 0:
 				draw_rect(rect, Color(0.6, 0.7, 0.5, 0.025))
 			if model.grid.blockers.get(cell, 0) == -1:
@@ -45,6 +47,11 @@ func _draw() -> void:
 		if resource.remaining == 0:
 			continue
 		var center := cell_center(resource.footprint.position)
+		if resource.kind == ResourceKind.Type.WOOD:
+			draw_line(center + Vector2(0, 9), center + Vector2(0, -7), Color("#806345"), 3)
+			draw_circle(center + Vector2(0, -3), 10, Color("#305542"))
+			draw_circle(center + Vector2(3, -6), 6, Color("#42654c"))
+			continue
 		draw_circle(center, 11, ResourceKind.COLORS[resource.kind].darkened(0.3))
 		draw_circle(center + Vector2(-2, -2), 8, ResourceKind.COLORS[resource.kind])
 		draw_string(font, center + Vector2(-4, 4), ResourceKind.NAMES[resource.kind].left(1),

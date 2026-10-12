@@ -1,13 +1,23 @@
 # Repository guidance
 
 This is the Godot 4.5.2 Standard / typed GDScript RTS prototype: Stage 1 playable
-economy/navigation and Stage 2 combat backend.
+economy/navigation, Stage 2 combat backend and Stage 3 maps/mission triggers.
 
 ## Before changing gameplay
 
 - Read README.md and docs/STAGE_1_ARCHITECTURE.md.
 - For combat also read docs/STAGE_2_COMBAT.md. Its explicit Stage 2 rules supersede
   the older GDD's aura/payroll tuning for this opt-in backend only.
+- For map/height/stealth changes also read docs/STAGE_3_MAPS_MISSIONS.md.
+  Stage 3 explicitly overrides the old GDD with +25% post-counter high-ground
+  damage and Joß Fritz failing after three rearmed detection episodes. Do not
+  silently restore the old no-damage height rule or Allstedt Alert/chase model.
+- Keep logical elevation separate from map/screen Y. Sample actual body centers.
+- Keep generation bounded and seeded with local RNG; preserve protected routes
+  and ore access. Do not advertise the compact map as a balanced ranked RMS.
+- Stealth takes the union of enemy guard sightings, with one clock, full unseen
+  rearming and a one-shot terminal result. LOS Areas are authored volumes, not
+  terrain-occluding vision. Map choice must not auto-enable campaign systems.
 - Consult the relevant docs/gdd phase for costs, faction rules and future scope.
 - Keep simulation models independent from Node/UI APIs. Inject the world/services;
   do not introduce global scene-tree lookups inside workers.

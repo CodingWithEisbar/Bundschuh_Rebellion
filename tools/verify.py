@@ -42,6 +42,7 @@ def main() -> int:
     reports = [
         ("tests/run_tests.gd", ROOT / "test-results" / "stage1.json", 18),
         ("tests/combat_tests.gd", ROOT / "test-results" / "stage2.json", 22),
+        ("tests/stage3_tests.gd", ROOT / "test-results" / "stage3.json", 21),
     ]
     for _, report_path, _ in reports:
         report_path.unlink(missing_ok=True)
@@ -58,6 +59,7 @@ def main() -> int:
                 raise RuntimeError(f"{report_path.name} is incomplete or contains failures.")
             passed += report["passed"]
         run(common + ["--script", "examples/stage2_backend_demo.gd"])
+        run(common + ["--script", "examples/stage3_backend_demo.gd"])
         run(common + ["--script", "tests/layout_smoke.gd"])
         run(common + ["--quit-after", "10"])
         print(f"VERIFIED: {passed} integration cases. Reports: {ROOT / 'test-results'}")

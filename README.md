@@ -2,6 +2,7 @@
 
 **Stage 1 — Core RTS Prototype & Pathfinding**
 **Stage 2 — Combat Matrix & Asymmetrical Mechanics (backend)**
+**Stage 3 — Procedural Maps, High Ground & Mission Triggers**
 Engine được ghim: **Godot 4.5.2 Standard**, GDScript có kiểu dữ liệu. Mở project và chạy ngay, không cần .NET, asset pack hoặc plugin trả phí.
 
 Đây là nền prototype có mã nguồn, scene điều khiển và regression tests. Presentation hiện là top-down greybox để kiểm tra gameplay; hướng isometric sprite và art/audio của GDD Phase 4 sẽ được áp dụng ở giai đoạn nội dung.
@@ -34,6 +35,9 @@ Không cần export templates để chạy bằng editor. Repo không chứa bin
 | Combat backend | Damage M/P + armor-class counters; Pike +25 Cavalry; attack cooldown và damage cùng tick |
 | Zeal aura | Spatial hash mỗi 1s, bán kính 6 ô; +15% attack rate/movement speed cho đồng minh, không stack |
 | Mercenary payroll | Scenario opt-in, mỗi 30s trừ Gold/Landsknecht; kho về 0 thì đổi ownership sang hostile và emit DesertionEvent |
+| Black Forest | Map theo seed, cellular automata, ba hành lang hẹp, cây khai thác được và mỏ Gold/Stone có đường tiếp cận |
+| High ground | +25% sau armor/counter; cao độ riêng với tọa độ màn hình; kiểm tra footprint phẳng khi xây |
+| Stealth backend | Joß Fritz, thanh detection, fail sau 3 episode; Area2D adapter và events, cấu hình qua Resource |
 | Drop-offs | Town Center nhận cả bốn loại; Mill nhận Food; Lumber Camp nhận Wood; Mining Camp nhận Gold/Stone |
 | HUD & input | Chọn/kéo chọn/Shift, lệnh theo ngữ cảnh, minimap, camera, pause, tốc độ 1×/4×, progress/HP/cargo |
 | Verification | Tests chạy bằng Godot thật; kiểm tra 200 quân qua choke một ô, đi ngược chiều, bảo toàn tài nguyên và construction |
@@ -56,14 +60,15 @@ Không cần export templates để chạy bằng editor. Repo không chứa bin
 | Xem tối đa tám route được chọn | Tab |
 | Reset sandbox 16 dân | F6 |
 | Reset stress scenario 200 dân | F7 — tự ra lệnh vượt đường rừng |
+| Tạo Black Forest theo seed | Nhập ô seed → F8 / nút Forest / Enter |
 
-F6/F7 **reset toàn bộ sandbox hiện tại**. Demo cấp sẵn tài nguyên và housing để thử hệ thống; đây không phải opening skirmish tiêu chuẩn trong GDD. Chưa có lưu game.
+F6/F7/F8 **reset toàn bộ sandbox hiện tại**. Demo cấp sẵn tài nguyên và housing để thử hệ thống; đây không phải opening skirmish tiêu chuẩn trong GDD. Chưa có lưu game.
 
 ## Thử ba vòng gameplay
 
 **Di chuyển đông quân:** nhấn F7, quan sát 200 dân đi qua khe rừng rộng một ô và tập kết ở bên phải. Dùng Tab để xem đường, nút Speed để tăng tốc. Chọn nhóm ở hai phía và ra lệnh đi ngược chiều để quan sát nhường đường.
 
-**Khai thác:** nhấn F6, chọn vài dân rồi click phải resource có chữ F/W/G/S. Chọn riêng một dân để đọc cargo. Cargo đầy hoặc node hết thì dân giao hàng; HUD chỉ tăng khi giao xong. Dân giữ cargo và chờ nếu không có drop-off đã hoàn tất và đi tới được.
+**Khai thác:** nhấn F6, chọn vài dân rồi click phải cây hoặc resource có chữ F/G/S. Chọn riêng một dân để đọc cargo. Cargo đầy hoặc node hết thì dân giao hàng; HUD chỉ tăng khi giao xong. Dân giữ cargo và chờ nếu không có drop-off đã hoàn tất và đi tới được.
 
 **Xây dựng:** chọn dân → H/J/K/L → di chuột trên grid. Xem lý do BUILD/BLOCKED ở HUD. Click vị trí hợp lệ; chi phí được trừ đúng một lần, HP khởi đầu bằng 0. Có thể chọn thêm dân và click phải foundation để xây nhanh hơn. House hoàn tất tăng 5 housing; camp chỉ nhận tài nguyên khi hoàn tất.
 
@@ -79,7 +84,7 @@ Linux/macOS:
 
     python3 tools/verify.py --godot /path/to/godot
 
-Lệnh thực hiện import/compile, regression tests cả hai stage, backend demo, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json** và **test-results/stage2.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
+Lệnh thực hiện import/compile, regression tests cả ba stage, hai backend demo, HUD layout check và main-scene smoke test. Report JSON nằm trong **test-results/stage1.json**, **stage2.json** và **stage3.json**; thư mục này được bỏ qua trong Git. Parser/runtime errors làm validation thất bại kể cả khi Godot trả exit code 0.
 
 CI tương ứng: [.github/workflows/godot.yml](.github/workflows/godot.yml). Workflow ghim engine và checksum, chỉ cần quyền đọc nội dung repo.
 
@@ -98,6 +103,21 @@ kỳ lương **30s**, mặc định **1G/quân/kỳ**, chỉnh được. Theo pr
 Gold về 0 cũng gây mutiny. Payroll được bật riêng cho scenario; không tự thêm vào
 skirmish. [Tài liệu](docs/STAGE_2_COMBAT.md) ghi rõ các khác biệt với GDD cũ.
 
+## Thử Stage 3
+
+Nhấn **F8** để tạo Black Forest với seed trong HUD (mặc định 1524). Map có 16 dân,
+Town Center và tài nguyên thử nghiệm; chọn cây/mỏ để khai thác hoặc đi qua ba khe
+rừng. Cây cạn mở đường đi mới. F6/F7 vẫn trở lại fixture cũ.
+
+    godot --headless --path . --script examples/stage3_backend_demo.gd -- --seed=1524
+
+Demo in thông tin map, đòn Pike từ **27 → 34 damage** khi đứng cao hơn, và
+**MissionFailed sau 3 detection episodes** của Joß Fritz. File `.tres` trong
+[data](data) chỉnh seed, kích thước, mật độ, mỏ và tham số mission.
+[Stage 3 guide](docs/STAGE_3_MAPS_MISSIONS.md) có kiến trúc, API, cách gắn LOS
+collider và các luật mới thay GDD cũ. Combat/stealth hiện là backend; F8 chưa phải
+campaign có guard patrol hoặc quân chiến đấu điều khiển được.
+
 ## Tổ chức source
 
 | Đường dẫn | Trách nhiệm |
@@ -108,6 +128,9 @@ skirmish. [Tài liệu](docs/STAGE_2_COMBAT.md) ghi rõ các khác biệt với 
 | [scripts/units](scripts/units) | Villager data và state machine |
 | [scripts/construction](scripts/construction) | Building catalog, work/HP/completion |
 | [scripts/combat](scripts/combat) | CombatWorld, damage, stat modifiers, spatial aura và mercenary payroll |
+| [scripts/maps](scripts/maps) | Recipe, seeded generator, validation và playable factory |
+| [scripts/missions](scripts/missions) | Mission state, exposure/counts và Area2D LOS adapter |
+| [data](data) | Map/mission Resources chỉnh qua Inspector |
 | [scripts/presentation](scripts/presentation) | Input, greybox renderer, minimap, HUD |
 | [tests/run_tests.gd](tests/run_tests.gd) | Integration tests dùng chính model của game |
 | [tests/combat_tests.gd](tests/combat_tests.gd) | Combat/aura/payroll regression và mass-battle benchmark |
@@ -116,6 +139,10 @@ skirmish. [Tài liệu](docs/STAGE_2_COMBAT.md) ghi rõ các khác biệt với 
 | [docs/STAGE_1_VALIDATION.md](docs/STAGE_1_VALIDATION.md) | Phạm vi kiểm thử, kết quả và giới hạn |
 | [docs/STAGE_2_COMBAT.md](docs/STAGE_2_COMBAT.md) | Luật Stage 2, API/events, timing, movement adapter và ví dụ |
 | [docs/STAGE_2_VALIDATION.md](docs/STAGE_2_VALIDATION.md) | Kết quả và phạm vi kiểm thử backend |
+| [tests/stage3_tests.gd](tests/stage3_tests.gd) | Map, runtime economy/navigation, height và physics LOS regressions |
+| [examples/stage3_backend_demo.gd](examples/stage3_backend_demo.gd) | Seeded map, high-ground hit và ba detection episodes |
+| [docs/STAGE_3_MAPS_MISSIONS.md](docs/STAGE_3_MAPS_MISSIONS.md) | Cấu hình, thuật toán, integration và phạm vi Stage 3 |
+| [docs/STAGE_3_VALIDATION.md](docs/STAGE_3_VALIDATION.md) | Kết quả kiểm thử ba stage và giới hạn đo đạc |
 | [docs/gdd](docs/gdd) | Bốn phase thiết kế làm nền cho các stage tiếp theo |
 | [AGENTS.md](AGENTS.md) | Quy tắc thay đổi source cho người và AI agent |
 
@@ -124,6 +151,6 @@ skirmish. [Tài liệu](docs/STAGE_2_COMBAT.md) ghi rõ các khác biệt với 
 - Navigation được kiểm tra cho **tối đa 200 friendly foot units cùng kích thước**. Passing dùng bán kính 0,18 ô; siege/cavalry lớn cần clearance và quy tắc giao thông riêng trước khi thêm.
 - Có gather bonus Food/Wood Bundschuh và carry bonus League A3 ở lớp model. Demo đang dùng Bundschuh A1; chưa có màn chọn phe/age-up.
 - Stage 2 có backend combat; chưa gắn military roster/speed modifiers vào controller di chuyển dân hoặc scene F5. Military navigation, lựa chọn quân và giao diện combat là bước tích hợp tiếp theo. Combat API trả movement budget đã buff; không tự di chuyển xuyên vật cản.
-- Chưa có fog of war, tech tree, unit recruitment, campaign triggers, save/load hoặc multiplayer. Housing được theo dõi ở Stage 1; combat spawn là API scenario riêng, chưa thu chi phí tuyển hoặc kiểm tra housing.
+- Có stealth trigger backend; chưa có campaign hoàn chỉnh, fog of war, tech tree, unit recruitment, save/load hoặc multiplayer. Housing được theo dõi ở Stage 1; combat spawn là API scenario riêng, chưa thu chi phí tuyển hoặc kiểm tra housing.
 - Gather rates, building HP/footprints và công thức nhiều dân xây là tham số prototype được ghi trong architecture; chưa phải kết quả cân bằng cuối.
 - Hiệu năng headless của simulation không phải FPS đồ họa. Kiểm tra GPU/rendering và playtest trên máy mục tiêu là bước tiếp theo trước khi gọi đây là bản production hoàn chỉnh.

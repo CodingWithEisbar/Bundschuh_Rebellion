@@ -19,6 +19,8 @@ var bank := ResourceBank.new()
 var paths: PathService
 var traffic := TrafficController.new()
 var combat: CombatWorld # Explicit opt-in backend; F6/F7 stay economy/nav fixtures.
+var mission: MissionTriggerManager # Campaign-only, never enabled by map choice.
+var generated_map: GeneratedMap # Optional immutable recipe/result for diagnostics.
 var agents: Dictionary = {}
 var resources: Dictionary = {}
 var buildings: Dictionary = {}
@@ -55,7 +57,17 @@ func enable_combat(owner_id: int = 0, team_id: int = 0,
 	if not backend.add_player(owner_id, team_id, side, bank, payroll_enabled, wage):
 		return null
 	combat = backend
+	combat.bind_terrain(grid)
 	return combat
+
+
+func enable_stealth(config: StealthMissionConfig = null) -> MissionTriggerManager:
+	if mission != null:
+		return mission
+	if config != null and not config.validate().is_empty():
+		return null
+	mission = MissionTriggerManager.new(config)
+	return mission
 
 
 func motion_alpha() -> float:
@@ -319,6 +331,8 @@ func validate_placement(key: String, origin: Vector2i, builders: Array[int]) -> 
 	for cell in grid.cells(footprint):
 		if not grid.walkable(cell):
 			return {"ok": false, "reason": "Terrain, resource, building or map edge."}
+		if grid.height_at(cell) != grid.height_at(origin):
+			return {"ok": false, "reason": "Building footprint must have one elevation."}
 		if occupied.has(cell) or slot_claims.has(cell) or future.has(cell):
 			return {"ok": false, "reason": "A unit or reserved destination occupies the footprint."}
 		blocked[cell] = true
@@ -358,6 +372,8 @@ func step(delta: float = FIXED_DT) -> void:
 	# the host steps the simulation, so pause and speed controls remain coherent.
 	if combat != null:
 		combat.advance(delta)
+	if mission != null:
+		mission.advance(delta)
 	_move_elapsed = minf(MOVE_PERIOD, _move_elapsed + delta)
 	for agent: VillagerAgent in agents.values():
 		agent.capacity = 10 + (3 if faction == "league" and age >= 3 else 0)

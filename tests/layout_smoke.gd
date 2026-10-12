@@ -24,7 +24,7 @@ func _run() -> void:
 		var controls: Array[Control] = []
 		_collect(main, controls)
 		for control in controls:
-			if not control.visible or not (control is Label or control is Button or control is RtsMinimap):
+			if not control.visible or not (control is Label or control is Button or control is LineEdit or control is RtsMinimap):
 				continue
 			var rect := control.get_global_rect()
 			if rect.position.x < -1 or rect.position.y < -1 or rect.end.x > resolution.x + 1 or rect.end.y > resolution.y + 1:
@@ -51,6 +51,39 @@ func _run() -> void:
 	await process_frame
 	if main.dragging:
 		errors.append("Mouse-up over HUD must end world selection drag.")
+
+	# F8 is exercised through input even when the seed owns keyboard focus.
+	main.seed_input.text = "1525"
+	main.seed_input.grab_focus()
+	main.dragging = true
+	main.view.selecting = true
+	key = InputEventKey.new()
+	key.keycode = KEY_F8
+	key.pressed = true
+	Input.parse_input_event(key)
+	await process_frame
+	if main.world.generated_map == null or main.world.generated_map.seed_value != 1525:
+		errors.append("F8 must load the typed seed into a playable generated map.")
+	if main.dragging or main.view.selecting or not main.selected.is_empty():
+		errors.append("Map reset must clear drag and selection state.")
+	var kept: RtsSimulation = main.world
+	main.seed_input.text = "invalid"
+	main._reset_forest()
+	if main.world != kept:
+		errors.append("Invalid seed must keep the existing world.")
+	main.seed_input.grab_focus()
+	key = InputEventKey.new()
+	key.keycode = KEY_A
+	key.ctrl_pressed = true
+	key.pressed = true
+	Input.parse_input_event(key)
+	await process_frame
+	if not main.selected.is_empty():
+		errors.append("Ctrl+A in the seed field must not select villagers.")
+	main.seed_input.release_focus()
+	main._reset(false)
+	if main.world.generated_map != null or main.world.agents.size() != 16:
+		errors.append("F6 fixture must remain accessible after a procedural map.")
 
 	for error in errors:
 		push_error(error)

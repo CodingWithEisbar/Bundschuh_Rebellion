@@ -11,6 +11,7 @@ var size: Vector2i
 var revision: int = 0
 var astar: AStarGrid2D
 var blockers: Dictionary = {} # cell -> owner ID; terrain uses -1
+var elevations := PackedInt32Array() # Logical vertical height, NOT screen/grid Y.
 var _components: Dictionary = {}
 var _component_revision: int = -1
 
@@ -18,6 +19,7 @@ var _component_revision: int = -1
 func _init(dimensions: Vector2i = Vector2i(64, 40)) -> void:
 	assert(dimensions.x > 0 and dimensions.y > 0)
 	size = dimensions
+	elevations.resize(size.x * size.y)
 	astar = AStarGrid2D.new()
 	astar.region = Rect2i(Vector2i.ZERO, size)
 	astar.cell_size = Vector2.ONE
@@ -34,6 +36,18 @@ func contains(cell: Vector2i) -> bool:
 
 func walkable(cell: Vector2i) -> bool:
 	return contains(cell) and not blockers.has(cell)
+
+
+func height_at(cell: Vector2i) -> int:
+	assert(contains(cell))
+	return elevations[cell.y * size.x + cell.x]
+
+
+func set_height(cell: Vector2i, height: int) -> void:
+	assert(contains(cell) and height >= 0)
+	elevations[cell.y * size.x + cell.x] = height
+	# Terraces are traversable. A cliff must be an explicit static blocker;
+	# elevation alone does not invalidate navigation paths or solid flags.
 
 
 func set_blocked(cell: Vector2i, owner: int) -> void:

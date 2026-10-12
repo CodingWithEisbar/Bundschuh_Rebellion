@@ -29,6 +29,37 @@ var _accumulator: float = 0.0
 var _advancing: bool = false
 var _orders: Dictionary = {} # attacker ID -> target ID; only active orders tick.
 var _events: Array[Dictionary] = []
+var _terrain: WorldGrid
+
+
+func bind_terrain(terrain: WorldGrid) -> bool:
+	## Optional 2D adapter. Standalone/3D hosts instead supply explicit elevation.
+	if _advancing or terrain == null:
+		return false
+	for unit: CombatUnit in units.values():
+		if not terrain.contains(Vector2i(unit.position.floor())):
+			return false
+	_terrain = terrain
+	for unit: CombatUnit in units.values():
+		_sample_elevation(unit)
+	return true
+
+
+func set_elevation(id: int, height: float) -> bool:
+	# A bound terrain is authoritative; a second source cannot override it.
+	if _advancing or _terrain != null or not units.has(id) or not is_finite(height):
+		return false
+	units[id].elevation = height
+	return true
+
+
+func _valid_position(point: Vector2) -> bool:
+	return point.is_finite() and (_terrain == null or _terrain.contains(Vector2i(point.floor())))
+
+
+func _sample_elevation(unit: CombatUnit) -> void:
+	if _terrain != null:
+		unit.elevation = _terrain.height_at(Vector2i(unit.position.floor()))
 
 
 func add_player(owner: int, team: int, side: int, bank: ResourceBank,
@@ -46,7 +77,7 @@ func add_player(owner: int, team: int, side: int, bank: ResourceBank,
 func spawn(kind: int, owner: int, position: Vector2) -> CombatUnit:
 	## Backend/scenario creation only: the recruitment system must pay and check
 	## age/housing before calling this. Combat IDs are local to this registry.
-	if _advancing or not players.has(owner) or units.size() >= MAX_UNITS or not position.is_finite():
+	if _advancing or not players.has(owner) or units.size() >= MAX_UNITS or not _valid_position(position):
 		return null
 	var data := CombatUnitCatalog.definition(kind)
 	if data.is_empty():
@@ -55,15 +86,17 @@ func spawn(kind: int, owner: int, position: Vector2) -> CombatUnit:
 	var unit := CombatUnit.new(_next_id, owner, player.team_id, player.faction, position, data)
 	_next_id += 1
 	units[unit.id] = unit
+	_sample_elevation(unit)
 	return unit
 
 
 func set_position(id: int, actual_center: Vector2) -> bool:
 	## Trusted navigation adapter API, not a player-issued teleport command.
 	## Caller samples the body trajectory, not an occupied/reserved endpoint.
-	if _advancing or not units.has(id) or not actual_center.is_finite():
+	if _advancing or not units.has(id) or not _valid_position(actual_center):
 		return false
 	units[id].position = actual_center
+	_sample_elevation(units[id])
 	return true
 
 
@@ -227,6 +260,10 @@ func _resolve_attacks() -> void:
 			continue
 		if attacker.recovery_work > 0.000001 or not in_weapon_range(attacker, target):
 			continue
+		# Sample both physical centers at the hit, including terrain edits since
+		# the last movement event. Never sample a reserved navigation endpoint.
+		_sample_elevation(attacker)
+		_sample_elevation(target)
 		var result := DamageCalculator.calculate(attacker, target)
 		var damage := int(result["total"])
 		hits.append({"attacker_id": id, "target_id": target.id, "damage": damage,

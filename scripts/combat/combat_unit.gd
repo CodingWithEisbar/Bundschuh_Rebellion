@@ -10,6 +10,7 @@ var team_id: int
 var faction: int
 var kind: int
 var position: Vector2
+var elevation: float = 0.0 # Vertical height; position.y is map north/south.
 var on_field: bool = true # False while garrisoned/transported; still on payroll.
 var mutinous: bool = false
 var max_hp: int

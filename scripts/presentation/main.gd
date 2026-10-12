@@ -14,6 +14,7 @@ var info_label: Label
 var message_label: Label
 var pause_button: Button
 var speed_button: Button
+var seed_input: LineEdit
 var accumulator: float = 0.0
 var hud_elapsed: float = 0.0
 var paused: bool = false
@@ -36,11 +37,41 @@ func _ready() -> void:
 
 
 func _reset(stress: bool) -> void:
-	world = DemoFactory.create(stress)
+	_mount_world(DemoFactory.create(stress))
+	if stress:
+		_select_all()
+		world.command_move(selected, Vector2i(53, 19))
+	_show_message("200 villagers ordered through the one-cell forest pass." if stress else
+		"Select villagers, then right-click a resource. H/J/K/L place buildings.")
+	_refresh_hud()
+
+
+func _reset_forest() -> void:
+	var seed_text := seed_input.text.strip_edges()
+	if not seed_text.is_valid_int():
+		_show_message("Seed must be an integer. Current map kept.")
+		return
+	var config := load("res://data/maps/black_forest_default.tres").duplicate(true) as BlackForestConfig
+	config.seed_value = seed_text.to_int()
+	var map := BlackForestGenerator.generate(config)
+	if not map.valid():
+		_show_message("Map generation failed: " + "; ".join(map.errors))
+		return
+	_mount_world(BlackForestFactory.create(map))
+	seed_input.release_focus()
+	_show_message("Black Forest · seed %d · 3 passages · trees can be harvested." % config.seed_value)
+	_refresh_hud()
+
+
+func _mount_world(next_world: RtsSimulation) -> void:
+	world = next_world
 	view.model = world
 	minimap.model = world
 	selected.clear()
 	placing = ""
+	view.placement_key = ""
+	dragging = false
+	view.selecting = false
 	inspected_building = -1
 	accumulator = 0.0
 	paused = false
@@ -49,12 +80,6 @@ func _reset(stress: bool) -> void:
 	world.bank.changed.connect(_update_stock)
 	world.notice.connect(_show_message)
 	_update_stock(world.bank.snapshot())
-	if stress:
-		_select_all()
-		world.command_move(selected, Vector2i(53, 19))
-	_show_message("200 villagers ordered through the one-cell forest pass." if stress else
-		"Select villagers, then right-click a resource. H/J/K/L place buildings.")
-	_refresh_hud()
 
 
 func _physics_process(delta: float) -> void:
@@ -74,13 +99,14 @@ func _process(delta: float) -> void:
 	if world == null:
 		return
 	var pan := Vector2.ZERO
-	if Input.is_physical_key_pressed(KEY_W):
+	var editing_seed := seed_input.has_focus()
+	if not editing_seed and Input.is_physical_key_pressed(KEY_W):
 		pan.y -= 1
-	if Input.is_physical_key_pressed(KEY_S):
+	if not editing_seed and Input.is_physical_key_pressed(KEY_S):
 		pan.y += 1
-	if Input.is_physical_key_pressed(KEY_A) and not Input.is_key_pressed(KEY_CTRL):
+	if not editing_seed and Input.is_physical_key_pressed(KEY_A) and not Input.is_key_pressed(KEY_CTRL):
 		pan.x -= 1
-	if Input.is_physical_key_pressed(KEY_D):
+	if not editing_seed and Input.is_physical_key_pressed(KEY_D):
 		pan.x += 1
 	camera.position += pan.normalized() * 600.0 * delta / camera.zoom.x
 	view.selected = selected
@@ -105,9 +131,12 @@ func _input(event: InputEvent) -> void:
 		_finish_selection(event.shift_pressed)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventKey and event.pressed and not event.echo:
+		# Text entry owns Ctrl+A, Space and letter keys while the seed is focused.
+		if seed_input.has_focus() and event.keycode not in [KEY_ESCAPE, KEY_F8]:
+			return
 		# RTS shortcuts take precedence over a focused button's ui_accept.
 		# Space must pause, not accidentally activate the last clicked button.
-		if event.keycode in [KEY_ESCAPE, KEY_SPACE, KEY_X, KEY_TAB, KEY_F6, KEY_F7, KEY_H, KEY_J, KEY_K, KEY_L] or (event.keycode == KEY_A and event.ctrl_pressed):
+		if event.keycode in [KEY_ESCAPE, KEY_SPACE, KEY_X, KEY_TAB, KEY_F6, KEY_F7, KEY_F8, KEY_H, KEY_J, KEY_K, KEY_L] or (event.keycode == KEY_A and event.ctrl_pressed):
 			_unhandled_input(event)
 			get_viewport().set_input_as_handled()
 
@@ -116,7 +145,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if world == null:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
+		if seed_input.has_focus() and event.keycode not in [KEY_ESCAPE, KEY_F8]:
+			return
 		if event.keycode == KEY_ESCAPE:
+			seed_input.release_focus()
 			placing = ""
 			dragging = false
 			view.selecting = false
@@ -132,6 +164,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_reset(false)
 		elif event.keycode == KEY_F7:
 			_reset(true)
+		elif event.keycode == KEY_F8:
+			_reset_forest()
 		elif event.keycode in [KEY_H, KEY_J, KEY_K, KEY_L]:
 			var bindings := {KEY_H: "house", KEY_J: "mill", KEY_K: "lumber_camp", KEY_L: "mining_camp"}
 			_begin_placement(bindings[event.keycode])
@@ -288,7 +322,7 @@ func _build_hud() -> void:
 	var top_row := HBoxContainer.new()
 	top_row.add_theme_constant_override("separation", 22)
 	top.add_child(top_row)
-	var title := _label("BUNDSCHUH  /  STAGE 1", 18, Color("#dfc38c"))
+	var title := _label("BUNDSCHUH  /  STAGE 3", 18, Color("#dfc38c"))
 	top_row.add_child(title)
 	for kind in ResourceKind.Type.values():
 		var label := _label("", 17, ResourceKind.COLORS[kind])
@@ -343,9 +377,19 @@ func _build_hud() -> void:
 	commands.add_child(speed_button)
 	var scenarios := HBoxContainer.new()
 	actions.add_child(scenarios)
-	scenarios.add_child(_button("Reset: 16 [F6]", func() -> void: _reset(false)))
-	scenarios.add_child(_button("Reset: 200 [F7]", func() -> void: _reset(true)))
-	actions.add_child(_label("Greybox sandbox · scenario grants · no combat yet", 13, Color("#9caaac")))
+	scenarios.add_child(_button("16 [F6]", func() -> void: _reset(false)))
+	scenarios.add_child(_button("200 [F7]", func() -> void: _reset(true)))
+	scenarios.add_child(_button("Forest [F8]", _reset_forest))
+	seed_input = LineEdit.new()
+	seed_input.text = "1524"
+	seed_input.placeholder_text = "Seed"
+	seed_input.max_length = 18
+	seed_input.custom_minimum_size.x = 100
+	seed_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	seed_input.tooltip_text = "Black Forest seed. Enter or F8 regenerates the sandbox."
+	seed_input.text_submitted.connect(func(_text: String) -> void: _reset_forest())
+	scenarios.add_child(seed_input)
+	actions.add_child(_label("Sandbox · reset clears current progress", 13, Color("#9caaac")))
 
 
 func _panel() -> PanelContainer:

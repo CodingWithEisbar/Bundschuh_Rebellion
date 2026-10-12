@@ -1,5 +1,9 @@
 # Stage 2 — Combat Matrix & Asymmetrical Mechanics
 
+> Stage 3 bổ sung cao độ: +25% sau armor/counter, `bind_terrain` và explicit
+> elevation. Xem [Stage 3 guide](STAGE_3_MAPS_MISSIONS.md). Ví dụ damage ở tài liệu
+> Stage 2 này mặc định hai đơn vị cùng độ cao; luật aura/payroll giữ nguyên.
+
 Engine: **Godot 4.5.2 Standard**, typed GDScript. Đây là backend chạy được bằng
 Godot thật, nối với clock và ResourceBank của Stage 1. F5/F6/F7 vẫn là scene thử
 economy/navigation; Stage 2 chưa thêm giao diện điều khiển quân chiến đấu.

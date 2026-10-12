@@ -17,6 +17,9 @@ func _draw() -> void:
 	var scale_xy := size / Vector2(model.grid.size)
 	for cell: Vector2i in model.grid.blockers:
 		var color := Color("#152c24") if model.grid.blockers[cell] == -1 else Color("#bca473")
+		var resource: GatherableResource = model.resources.get(model.grid.blockers[cell])
+		if resource != null:
+			color = Color("#152c24") if resource.kind == ResourceKind.Type.WOOD else ResourceKind.COLORS[resource.kind]
 		draw_rect(Rect2(Vector2(cell) * scale_xy, scale_xy), color)
 	for agent: VillagerAgent in model.agents.values():
 		draw_circle(agent.display_position(model.motion_alpha()) * scale_xy, 1.5, Color("#aee7d4"))

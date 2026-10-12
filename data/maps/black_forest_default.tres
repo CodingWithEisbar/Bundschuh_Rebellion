@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BlackForestConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/black_forest_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+seed_value = 1524
+map_size = Vector2i(64, 40)
+initial_forest = 0.63
+smoothing_steps = 3
+corridor_width = 3
+gold_veins = 6
+stone_veins = 4
