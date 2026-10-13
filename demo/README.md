@@ -6,7 +6,7 @@ Trên GitHub, mở file rồi chọn **Download raw file** ở góc phải. Lưu
 `.html`, sau đó mở bằng Chrome, Edge hoặc Firefox trên máy tính. Hoặc tải cả
 repo bằng **Code → Download ZIP**, giải nén và mở file trong `demo/`.
 Gameplay không cần Godot, server, Internet, tài khoản, package hay asset ngoài.
-Nhạc YouTube ở menu là tùy chọn và cần Internet. Trang xem source của GitHub
+Nhạc MP3 ở menu được nhúng sẵn trong HTML và cũng nghe được offline. Trang xem source của GitHub
 không chạy HTML; cần tải file về trước.
 
 Đã kiểm tra thực tế bằng Chromium, mở qua `file://` với network offline.
@@ -14,41 +14,20 @@ Firefox/Edge dùng API tiêu chuẩn tương thích nhưng chưa được kiểm
 
 ## Nhạc nền menu
 
-[Bài bro chọn trên YouTube](https://www.youtube.com/watch?v=pMLeQAPhHN8) được nhúng
-ngay trong file HTML: khi mở menu bắt đầu, player tự tải và yêu cầu phát nhạc.
-**Nếu trình duyệt chặn tự phát có tiếng, bấm ▶ ngay trong player.** Player hiển
-thị đầy đủ để chỉnh âm lượng/tạm dừng; video lặp trong menu.
+MP3 **Wir sind des Geyers schwarzer Haufen** do người dùng cung cấp trong
+`sources/` được nhúng nguyên bản dưới dạng base64 trong HTML. Chỉ cần mang theo
+một file HTML, không cần MP3 riêng, Internet, YouTube hoặc server. Nhạc lặp ở
+menu mở đầu; trang tự yêu cầu phát ngay khi mở.
 
-**Vào trận**, đổi tab hoặc mất kết nối sẽ gỡ player và dừng nhạc. Khi quay lại
-menu/tab hoặc có mạng trở lại, player tự tải lại nếu nhạc vẫn bật. **Tắt nhạc**
-giữ nhạc tắt qua các lần chuyển này; bấm **Bật nhạc** để bật lại. Lựa chọn áp dụng
-trong phiên mở file hiện tại. Nút **Âm** trong trận chỉ điều khiển âm báo gameplay.
+**Nếu trình duyệt chặn tự phát có tiếng, bấm ▶ ngay trong trình phát.** Thanh
+điều khiển âm thanh luôn hiện ở menu khi nhạc được bật, cho phép chỉnh âm lượng
+và tạm dừng. Trạng thái chỉ ghi đang phát khi nhận sự kiện phát thực tế.
 
-Player tải từ YouTube ngay khi menu hiển thị và đang có mạng; file HTML không
-chứa bản MP3 hoặc bản sao âm thanh offline. Gameplay vẫn chạy offline. Khả năng
-phát phụ thuộc mạng, trình duyệt và quyền cho phép nhúng của video trên YouTube.
-
-**Nếu mở HTML trực tiếp và YouTube báo lỗi 153**, dùng liên kết **Mở bài nhạc
-trên YouTube** ở menu, hoặc chạy HTML qua HTTP để player nhận referrer thực:
-
-1. Mở Terminal/PowerShell trong thư mục `demo/` (hoặc nơi đã lưu file HTML).
-2. Nếu máy đã có Python, chạy:
-
-   ```sh
-   python -m http.server 8000 --bind 127.0.0.1
-   ```
-
-   Trên macOS/Linux có thể dùng `python3` thay cho `python`.
-3. Mở [http://localhost:8000/bundschuh_rebellion.html](http://localhost:8000/bundschuh_rebellion.html)
-   rồi bấm **▶** trong player nếu cần. Giữ terminal mở trong lúc chơi; Ctrl+C để dừng server.
-
-Bước này chỉ phục vụ nhạc trực tuyến; vẫn có thể mở HTML trực tiếp để chơi game.
-Nếu video không cho phép nhúng hoặc cần đăng nhập, dùng liên kết YouTube trong menu.
-Player dùng `youtube-nocookie.com`, kích thước ít nhất 200×200, controls hiển thị,
-`loop=1` và playlist đúng ID video. Không giả mạo origin/referrer để né lỗi 153.
-Tham khảo chính thức: [YouTube player parameters](https://developers.google.com/youtube/player_parameters)
-và [mã lỗi player](https://developers.google.com/youtube/iframe_api_reference#Events).
-Trình duyệt có thể chặn tự phát có tiếng: [Chrome autoplay policy](https://developer.chrome.com/blog/autoplay/).
+**Vào trận** hoặc ẩn tab sẽ dừng nhạc và giải phóng player. Khi quay lại menu/tab,
+nhạc tự tải lại từ đầu nếu vẫn bật. **Tắt nhạc** giữ nhạc tắt qua các lần chuyển
+này; bấm **Bật nhạc** để bật lại. Mất/có mạng không làm gián đoạn nhạc đã nhúng.
+Lựa chọn áp dụng trong phiên mở file hiện tại. Nút **Âm** trong trận chỉ điều khiển
+âm báo gameplay.
 
 ## Trận đầu tiên
 
@@ -95,7 +74,7 @@ có nút **Bật nhạc** riêng.
 
 Đây là **bản gameplay độc lập bằng Canvas 2D/JavaScript**, không phải Godot Web
 export và không thay thế source Godot của Stage 1–5. Một file chứa giao diện,
-đồ họa vẽ bằng mã, âm báo tổng hợp và snapshot JSON base stats của repo.
+đồ họa vẽ bằng mã, nhạc MP3 menu, âm báo tổng hợp và snapshot JSON base stats của repo.
 
 Có hai phe điều khiển được, map rừng có seed, chọn/kéo quân, A* tám hướng không
 cắt góc, hàng đợi path budget, tránh va chạm cục bộ, bốn tài nguyên hữu hạn,
