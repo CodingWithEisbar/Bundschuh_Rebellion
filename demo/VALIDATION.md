@@ -31,3 +31,25 @@ Các lượt screenshot đầu gặp timeout ở Chromium serverless khi chụp 
 liên tiếp; lượt cuối giảm ảnh dư, giữ kiểm tra hành vi đầy đủ và cả hai kích
 thước, hoàn tất toàn bộ 26 checks. Chưa kiểm thử riêng Firefox/Edge, mobile,
 multiplayer, save/load hay performance trên máy cấu hình thấp.
+
+## Cập nhật nhạc menu — 2026-10-13
+
+Đã thêm video `pMLeQAPhHN8` qua player YouTube chỉ tải khi người dùng bật.
+`tests/browser_demo_music.cjs` đạt **19 checks** trong Chromium: mặc định không
+request YouTube, offline vẫn vào trận được, nút dùng được bằng Space, URL/loop
+đúng video, player tối thiểu 200×200, referrer HTTP thật, bật/tắt, hủy khi đang
+load, trở về menu không phát trùng, dừng khi ẩn trang/mất mạng và bố cục 1440×900,
+1024×768. Bộ 17 model cases và 107 Godot/Python integration cases đã chạy lại,
+đều đạt.
+
+Lệnh chạy cùng cấu hình Playwright như UI runner:
+
+```sh
+node tests/browser_demo_music.cjs
+```
+
+Runner dùng response iframe giả được ghi nhãn rõ để kiểm tra adapter/giao diện.
+**Chưa xác nhận live audio hoặc quyền nhúng của video trên YouTube.** Báo cáo và
+ảnh ở `test-results/browser-demo-music/`; ảnh fixture không phải ảnh video thực.
+Không coi trạng thái đã mở iframe là đang phát nhạc. Hướng dẫn có cách chạy HTTP
+cho lỗi referrer 153 và liên kết mở video trực tiếp nếu player không phát.

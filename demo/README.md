@@ -5,11 +5,45 @@
 Trên GitHub, mở file rồi chọn **Download raw file** ở góc phải. Lưu đúng đuôi
 `.html`, sau đó mở bằng Chrome, Edge hoặc Firefox trên máy tính. Hoặc tải cả
 repo bằng **Code → Download ZIP**, giải nén và mở file trong `demo/`.
-Không cần Godot, server, Internet, tài khoản, package hay asset ngoài. Trang xem
-source của GitHub không chạy HTML; cần tải file về trước.
+Gameplay không cần Godot, server, Internet, tài khoản, package hay asset ngoài.
+Nhạc YouTube ở menu là tùy chọn và cần Internet. Trang xem source của GitHub
+không chạy HTML; cần tải file về trước.
 
 Đã kiểm tra thực tế bằng Chromium, mở qua `file://` với network offline.
 Firefox/Edge dùng API tiêu chuẩn tương thích nhưng chưa được kiểm thử riêng.
+
+## Nhạc nền menu
+
+Menu có nút **Bật nhạc** cho [bài bro chọn trên YouTube](https://www.youtube.com/watch?v=pMLeQAPhHN8).
+Bấm nút rồi bấm **▶** trong trình phát nếu trình duyệt chưa tự phát. Player hiển
+thị đầy đủ để chỉnh âm lượng/tạm dừng; video lặp trong menu. **Tắt nhạc**, **Vào
+trận**, đổi tab hoặc mất kết nối sẽ gỡ player và dừng nhạc. Khi trở về menu,
+bấm Bật nhạc lại. Nút **Âm** trong trận chỉ điều khiển âm báo gameplay riêng.
+
+Không có request YouTube trước khi bấm Bật nhạc; không tải MP3 hoặc nhúng bản
+sao bài nhạc vào repo. Gameplay vẫn chạy offline. Khả năng phát phụ thuộc mạng,
+trình duyệt và quyền cho phép nhúng của video trên YouTube.
+
+**Nếu mở HTML trực tiếp và YouTube báo lỗi 153**, dùng liên kết **Mở bài nhạc
+trên YouTube** ở menu, hoặc chạy HTML qua HTTP để player nhận referrer thực:
+
+1. Mở Terminal/PowerShell trong thư mục `demo/` (hoặc nơi đã lưu file HTML).
+2. Nếu máy đã có Python, chạy:
+
+   ```sh
+   python -m http.server 8000 --bind 127.0.0.1
+   ```
+
+   Trên macOS/Linux có thể dùng `python3` thay cho `python`.
+3. Mở [http://localhost:8000/bundschuh_rebellion.html](http://localhost:8000/bundschuh_rebellion.html)
+   rồi bấm **Bật nhạc**. Giữ terminal mở trong lúc chơi; Ctrl+C để dừng server.
+
+Bước này chỉ phục vụ nhạc trực tuyến; vẫn có thể mở HTML trực tiếp để chơi game.
+Nếu video không cho phép nhúng hoặc cần đăng nhập, dùng liên kết YouTube trong menu.
+Player dùng `youtube-nocookie.com`, kích thước ít nhất 200×200, controls hiển thị,
+`loop=1` và playlist đúng ID video. Không giả mạo origin/referrer để né lỗi 153.
+Tham khảo chính thức: [YouTube player parameters](https://developers.google.com/youtube/player_parameters)
+và [mã lỗi player](https://developers.google.com/youtube/iframe_api_reference#Events).
 
 ## Trận đầu tiên
 
@@ -49,7 +83,8 @@ trận, bao gồm đối phương. Có thể tạm dừng để ra lệnh hoặc
 
 Rời tab hoặc cửa sổ sẽ tự tạm dừng. Trở lại rồi nhấn Space. Thiết kế cho chuột
 và bàn phím, khuyến nghị cửa sổ từ 1024×768. Không có lưu trận; mở lại/reset
-bắt đầu trận mới. Âm thanh tắt mặc định, bật bằng nút **Âm**.
+bắt đầu trận mới. Âm báo gameplay tắt mặc định, bật bằng nút **Âm**. Nhạc menu
+có nút **Bật nhạc** riêng.
 
 ## Phạm vi bản demo
 
@@ -118,6 +153,7 @@ Kiểm tra UI tùy chọn cần Playwright + Chromium trên máy phát triển:
 # Cài công cụ ở ngoài repo hoặc workspace phát triển; game không phụ thuộc chúng.
 # Đặt PLAYWRIGHT_MODULE nếu module không nằm trong Node resolution path.
 node tests/browser_demo_ui.cjs
+node tests/browser_demo_music.cjs
 ```
 
 Runner mở file offline, thao tác chuột/phím, kiểm tra HUD, xây/tuyển quân, camera,

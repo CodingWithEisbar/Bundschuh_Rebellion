@@ -414,6 +414,65 @@
       .veil[hidden] {
         display: none;
       }
+      #start {
+        overflow-y: auto;
+      }
+      #start .welcome {
+        margin-block: auto;
+      }
+      .menu-music {
+        margin-top: 22px;
+        max-width: 420px;
+        padding-top: 14px;
+        border-top: 1px solid #647153;
+      }
+      .music-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .music-heading strong {
+        font:
+          18px Georgia,
+          'Times New Roman',
+          serif;
+        color: var(--gold);
+      }
+      #menu-music-toggle {
+        flex-shrink: 0;
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+      .title-intro .music-note {
+        font-size: 11px;
+        line-height: 1.6;
+        margin-top: 8px;
+      }
+      .menu-music a {
+        color: #ddc486;
+        text-underline-offset: 3px;
+      }
+      #menu-music-player {
+        margin-top: 12px;
+      }
+      #menu-music-player[hidden] {
+        display: none;
+      }
+      #menu-music-player iframe {
+        display: block;
+        width: 100%;
+        height: 220px;
+        min-width: 200px;
+        min-height: 200px;
+        border: 1px solid #657050;
+        background: #101c16;
+      }
+      @media (max-height: 740px) {
+        #start {
+          align-items: flex-start;
+        }
+      }
       .welcome {
         max-width: 1000px;
         width: 100%;
@@ -859,6 +918,41 @@
             Rừng Đen, năm 1525. Dưới những tán thông, một lời thề trở thành cuộc nổi dậy. Xây dựng
             làng, tập hợp binh sĩ và đưa lá cờ của bạn qua cánh rừng.
           </p>
+          <div class="menu-music" aria-label="Nhạc nền menu">
+            <div class="music-heading">
+              <strong>♪ Nhạc nền menu</strong>
+              <button
+                id="menu-music-toggle"
+                type="button"
+                aria-pressed="false"
+                aria-controls="menu-music-player"
+              >
+                Bật nhạc
+              </button>
+            </div>
+            <p id="menu-music-status" class="music-note" role="status" aria-live="polite">
+              Phát qua YouTube · Cần Internet · Tự dừng khi vào trận.
+            </p>
+            <div id="menu-music-player" hidden></div>
+            <p class="music-note">
+              <a
+                href="https://www.youtube.com/watch?v=pMLeQAPhHN8"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Mở bài nhạc trên YouTube ↗</a
+              >
+              <span id="menu-music-file-help" hidden>
+                <br />Nếu YouTube báo lỗi 153 khi mở file trực tiếp, xem mục
+                <a
+                  href="https://github.com/CodingWithEisbar/Bundschuh_Rebellion/blob/main/demo/README.md#nhạc-nền-menu"
+                  target="_blank"
+                  rel="noopener"
+                  >Nhạc nền menu</a
+                >
+                trong hướng dẫn để chạy qua localhost.
+              </span>
+            </p>
+          </div>
           <footer>RTS GAMEPLAY DEMO &nbsp; / &nbsp; 01 — BLACK FOREST</footer>
         </div>
         <div class="setup">
@@ -3223,8 +3317,6 @@
       document.addEventListener('keydown', (e) => {
         if (e.target instanceof HTMLInputElement) return;
         const k = e.key.toLowerCase();
-        if ([' ', 'tab', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'home'].includes(k))
-          e.preventDefault();
         if (k === 'escape') {
           if (!$('help-modal').hidden) closeHelp();
           else if (placement || attackMove) {
@@ -3235,6 +3327,8 @@
           return;
         }
         if (!started || renderedResult || !$('help-modal').hidden) return;
+        if ([' ', 'tab', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'home'].includes(k))
+          e.preventDefault();
         keys.add(k);
         if (e.repeat) return;
         if (k === ' ') togglePause();
@@ -3262,6 +3356,7 @@
         }
       });
       document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopMenuMusic();
         if (document.hidden && started) {
           paused = true;
           accumulator = 0;
@@ -3294,6 +3389,7 @@
           }),
       );
       function startGame() {
+        stopMenuMusic();
         const raw = Number($('seed').value);
         const seed = Number.isInteger(raw) && raw >= 0 && raw <= 999999 ? raw : 1524;
         $('seed').value = seed;
@@ -3322,6 +3418,7 @@
         toast('Làng đang chờ lệnh. Chia dân lấy lương thực, gỗ và vàng.');
       }
       function menu() {
+        stopMenuMusic();
         started = false;
         paused = false;
         keys.clear();
@@ -3352,7 +3449,58 @@
         $('result').hidden = false;
         tone(win ? 'win' : 'lose');
       }
-      /* Small bounded WebAudio cue pool; no network assets or fake recorded voices. */
+      /* The requested track is streamed by a visible, user-initiated YouTube
+         player. No API script, thumbnail or iframe is fetched before opt-in.
+         Removing the iframe stops playback even before its load has finished.
+         Do not hide a live player behind gameplay or extract audio from it. */
+      function stopMenuMusic() {
+        $('menu-music-player').replaceChildren();
+        $('menu-music-player').hidden = true;
+        $('menu-music-toggle').setAttribute('aria-pressed', 'false');
+        $('menu-music-toggle').textContent = 'Bật nhạc';
+        $('menu-music-status').textContent =
+          'Phát qua YouTube · Cần Internet · Tự dừng khi vào trận.';
+      }
+      $('menu-music-toggle').onclick = () => {
+        const host = $('menu-music-player');
+        if (host.childElementCount) {
+          stopMenuMusic();
+          return;
+        }
+        if ($('start').hidden) return;
+        if (!navigator.onLine) {
+          $('menu-music-status').textContent =
+            'Đang offline. Kết nối Internet rồi bật nhạc; bạn vẫn có thể vào trận.';
+          return;
+        }
+        const frame = document.createElement('iframe');
+        frame.title = 'Nhạc nền menu Bundschuh: Rebellion — YouTube';
+        frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        frame.allowFullscreen = true;
+        // Preserve the real HTTP origin when served; never spoof a file:// referrer.
+        frame.referrerPolicy = 'strict-origin-when-cross-origin';
+        frame.src =
+          'https://www.youtube-nocookie.com/embed/pMLeQAPhHN8' +
+          '?autoplay=1&loop=1&playlist=pMLeQAPhHN8&playsinline=1&controls=1&rel=0';
+        host.append(frame);
+        host.hidden = false;
+        $('menu-music-toggle').setAttribute('aria-pressed', 'true');
+        $('menu-music-toggle').textContent = 'Tắt nhạc';
+        // Loading an iframe does not prove playback; keep the status honest.
+        $('menu-music-status').textContent =
+          'Nhấn ▶ trong trình phát nếu nhạc chưa bắt đầu. Chỉnh âm lượng trên YouTube.';
+      };
+      $('menu-music-file-help').hidden = location.protocol !== 'file:';
+      window.addEventListener('pagehide', stopMenuMusic);
+      window.addEventListener('offline', () => {
+        const wasOpen = $('menu-music-player').childElementCount > 0;
+        stopMenuMusic();
+        if (wasOpen)
+          $('menu-music-status').textContent =
+            'Mất kết nối. Kết nối Internet rồi bật nhạc lại; gameplay vẫn hoạt động.';
+      });
+
+      /* Small bounded WebAudio cue pool for gameplay; separate from menu music. */
       let audio = null,
         audioOn = false,
         voices = [],

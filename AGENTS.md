@@ -85,7 +85,10 @@ This project is already backed by Git; source and its docs belong in this repo.
 `demo/bundschuh_rebellion.html` is a one-file offline Canvas/JavaScript vertical
 slice, not a Godot Web export. Keep its scenario tuning separate from core
 balance and retain its documented limitations in `demo/README.md`. No CDN,
-remote fonts, external assets or runtime npm dependencies may be required.
+remote fonts, external assets or runtime npm dependencies may be required for
+core gameplay. The user-requested YouTube menu track is an optional exception:
+load only after opt-in, keep the player visible, and destroy it before gameplay
+or when the page is hidden. Do not extract audio or spoof referrers.
 
 Combat base stats are embedded from the shared JSON, never hand-edited in HTML:
     python3 tools/sync_browser_demo.py
