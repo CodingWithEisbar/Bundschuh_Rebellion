@@ -55,20 +55,19 @@ fs.mkdirSync(out, { recursive: true });
       errors.push(String(e));
       console.error('PAGE ERROR', String(e));
     });
+    await context.setOffline(true);
     await page.goto(pathToFileURL(file).href);
     check(
       (await page.locator('#menu-music-player iframe').count()) === 0 && embeds.length === 0,
-      'no YouTube request or player before opt-in',
+      'opening the HTML offline does not request YouTube or create a player',
     );
     check(
       await page.locator('#menu-music-file-help').isVisible(),
       'file:// has usable YouTube/referrer fallback guidance',
     );
-    await context.setOffline(true);
-    await page.locator('#menu-music-toggle').click();
     check(
       (await page.locator('#menu-music-status').innerText()).includes('offline'),
-      'offline click explains connectivity instead of claiming playback',
+      'offline menu explains connectivity instead of claiming playback',
     );
     check(
       (await page.locator('#menu-music-player iframe').count()) === 0,
@@ -80,25 +79,35 @@ fs.mkdirSync(out, { recursive: true });
       'offline gameplay remains playable without music',
     );
     await context.setOffline(false);
+    await page.waitForFunction(() => navigator.onLine);
+    check(
+      (await page.locator('#menu-music-player iframe').count()) === 0,
+      'regaining connectivity during a match does not start menu music',
+    );
     await page.goto(origin + '/bundschuh_rebellion.html');
     check(
       await page.locator('#menu-music-file-help').isHidden(),
       'served page omits file-only guidance',
     );
-    await page.locator('#menu-music-toggle').focus();
-    await page.keyboard.press('Space');
     await page.locator('#menu-music-player iframe').waitFor();
     check(
-      (await page.locator('#menu-music-toggle').getAttribute('aria-pressed')) === 'true',
-      'Space activates accessible menu music control',
+      (await page.locator('#menu-music-toggle').getAttribute('aria-pressed')) === 'true' &&
+        (await page.locator('#menu-music-player iframe').count()) === 1,
+      'opening the menu automatically embeds one player without a click',
     );
     const iframe = page.locator('#menu-music-player iframe');
     const src = new URL(await iframe.getAttribute('src'));
     check(
       src.pathname === '/embed/pMLeQAPhHN8' &&
         src.searchParams.get('playlist') === 'pMLeQAPhHN8' &&
-        src.searchParams.get('loop') === '1',
-      'requested track is configured to loop with native controls',
+        src.searchParams.get('loop') === '1' &&
+        src.searchParams.get('autoplay') === '1' &&
+        src.searchParams.get('controls') === '1',
+      'requested track requests autoplay and looping with native play controls',
+    );
+    check(
+      (await page.locator('#menu-music-status').innerText()).includes('chặn tự phát'),
+      'menu explains the native Play fallback without claiming successful playback',
     );
     const size = await iframe.boundingBox();
     check(
@@ -114,9 +123,15 @@ fs.mkdirSync(out, { recursive: true });
       embeds.some((r) => r.referrer === origin + '/'),
       'HTTP embed receives the actual local page origin as referrer',
     );
-    await page.locator('#menu-music-toggle').click();
-    check((await iframe.count()) === 0, 'off destroys the iframe, not just its visibility');
-    await page.locator('#menu-music-toggle').click();
+    await page.locator('#menu-music-toggle').focus();
+    await page.keyboard.press('Space');
+    check(
+      (await iframe.count()) === 0 &&
+        (await page.locator('#menu-music-toggle').getAttribute('aria-pressed')) === 'false',
+      'Space switches music off and destroys the iframe',
+    );
+    await page.keyboard.press('Space');
+    check((await iframe.count()) === 1, 'Space switches menu music back on');
     await page.locator('#play').click();
     check(
       (await iframe.count()) === 0 && (await page.locator('#start').isHidden()),
@@ -125,31 +140,66 @@ fs.mkdirSync(out, { recursive: true });
     await page.locator('#help').click();
     await page.locator('#new-game').click();
     check(
-      (await iframe.count()) === 0 &&
-        (await page.locator('#menu-music-toggle').getAttribute('aria-pressed')) === 'false',
-      'returning to menu does not create duplicate or unsolicited playback',
+      (await iframe.count()) === 1 &&
+        (await page.locator('#menu-music-toggle').getAttribute('aria-pressed')) === 'true',
+      'returning to menu automatically restores enabled music',
     );
-    await page.locator('#menu-music-toggle').click();
+    await page.evaluate(() => window.dispatchEvent(new Event('pageshow')));
+    check((await iframe.count()) === 1, 'repeated menu lifecycle events never duplicate the player');
     await context.setOffline(true);
     await page.waitForFunction(() => !document.querySelector('#menu-music-player iframe'));
     check(
-      (await page.locator('#menu-music-status').innerText()).includes('Mất kết nối'),
+      (await page.locator('#menu-music-status').innerText()).includes('offline'),
       'network loss stops the player and preserves a helpful message',
     );
     await context.setOffline(false);
+    await iframe.waitFor();
+    check((await iframe.count()) === 1, 'network recovery resumes enabled music in the menu');
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    check((await iframe.count()) === 0, 'hidden-document lifecycle stops menu playback');
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event('online'));
+      window.dispatchEvent(new Event('pageshow'));
+    });
+    check((await iframe.count()) === 0, 'hidden pages stay silent across other lifecycle events');
+    await page.evaluate(() => {
+      delete document.hidden;
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    check((await iframe.count()) === 1, 'visible menu restores enabled music');
     await page.locator('#menu-music-toggle').click();
     await page.evaluate(() => {
       Object.defineProperty(document, 'hidden', { configurable: true, value: true });
       document.dispatchEvent(new Event('visibilitychange'));
       delete document.hidden;
+      document.dispatchEvent(new Event('visibilitychange'));
     });
-    check((await iframe.count()) === 0, 'hidden-document lifecycle stops menu playback');
+    await context.setOffline(true);
+    await page.waitForFunction(() => !navigator.onLine);
+    await context.setOffline(false);
+    await page.waitForFunction(() => navigator.onLine);
+    check((await iframe.count()) === 0, 'user Off survives visibility and network recovery');
+    await page.locator('#play').click();
+    await page.locator('#help').click();
+    await page.locator('#new-game').click();
+    check(
+      (await iframe.count()) === 0 &&
+        (await page.locator('#menu-music-toggle').getAttribute('aria-pressed')) === 'false',
+      'returning from a match preserves user Off',
+    );
+    await page.locator('#menu-music-toggle').click();
+    await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
+    check((await iframe.count()) === 0, 'pagehide destroys the player before navigation');
+    await page.evaluate(() => window.dispatchEvent(new Event('pageshow')));
+    check((await iframe.count()) === 1, 'pageshow can restore enabled menu music after navigation');
     const small = await context.newPage();
     await small.setViewportSize({ width: 1024, height: 768 });
     small.on('pageerror', (e) => errors.push(String(e)));
     await small.goto(origin + '/bundschuh_rebellion.html');
     await page.close();
-    await small.locator('#menu-music-toggle').click();
     const play = await small.locator('#play').boundingBox();
     const music = await small.locator('#menu-music-player iframe').boundingBox();
     check(

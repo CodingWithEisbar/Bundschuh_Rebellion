@@ -924,14 +924,14 @@
               <button
                 id="menu-music-toggle"
                 type="button"
-                aria-pressed="false"
+                aria-pressed="true"
                 aria-controls="menu-music-player"
               >
-                Bật nhạc
+                Tắt nhạc
               </button>
             </div>
             <p id="menu-music-status" class="music-note" role="status" aria-live="polite">
-              Phát qua YouTube · Cần Internet · Tự dừng khi vào trận.
+              Tự phát tại menu · Cần Internet · Tự dừng khi vào trận.
             </p>
             <div id="menu-music-player" hidden></div>
             <p class="music-note">
@@ -3357,6 +3357,7 @@
       });
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) stopMenuMusic();
+        else syncMenuMusic();
         if (document.hidden && started) {
           paused = true;
           accumulator = 0;
@@ -3430,6 +3431,7 @@
         placement = null;
         attackMove = false;
         cam = { x: 10, y: 15 };
+        syncMenuMusic();
       }
       $('play').onclick = startGame;
       $('again').onclick = menu;
@@ -3449,30 +3451,37 @@
         $('result').hidden = false;
         tone(win ? 'win' : 'lose');
       }
-      /* The requested track is streamed by a visible, user-initiated YouTube
-         player. No API script, thumbnail or iframe is fetched before opt-in.
+      /* The requested track is embedded directly in the opening menu. Autoplay
+         is only a request: the browser may require a click on the native play
+         control. Keep user preference separate from the iframe's lifecycle, so
+         returning to the menu resumes enabled music but never overrides Off.
          Removing the iframe stops playback even before its load has finished.
          Do not hide a live player behind gameplay or extract audio from it. */
+      let menuMusicEnabled = true;
       function stopMenuMusic() {
         $('menu-music-player').replaceChildren();
         $('menu-music-player').hidden = true;
-        $('menu-music-toggle').setAttribute('aria-pressed', 'false');
-        $('menu-music-toggle').textContent = 'Bật nhạc';
-        $('menu-music-status').textContent =
-          'Phát qua YouTube · Cần Internet · Tự dừng khi vào trận.';
       }
-      $('menu-music-toggle').onclick = () => {
+      function syncMenuMusic() {
         const host = $('menu-music-player');
-        if (host.childElementCount) {
+        $('menu-music-toggle').setAttribute('aria-pressed', String(menuMusicEnabled));
+        $('menu-music-toggle').textContent = menuMusicEnabled ? 'Tắt nhạc' : 'Bật nhạc';
+        if (!menuMusicEnabled) {
+          stopMenuMusic();
+          $('menu-music-status').textContent = 'Đã tắt nhạc menu. Bấm Bật nhạc để nghe lại.';
+          return;
+        }
+        if ($('start').hidden || document.hidden) {
           stopMenuMusic();
           return;
         }
-        if ($('start').hidden) return;
         if (!navigator.onLine) {
+          stopMenuMusic();
           $('menu-music-status').textContent =
-            'Đang offline. Kết nối Internet rồi bật nhạc; bạn vẫn có thể vào trận.';
+            'Đang offline. Nhạc sẽ tải lại khi có Internet; bạn vẫn có thể vào trận.';
           return;
         }
+        if (host.childElementCount) return; // Repeated lifecycle events never create duplicates.
         const frame = document.createElement('iframe');
         frame.title = 'Nhạc nền menu Bundschuh: Rebellion — YouTube';
         frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
@@ -3484,21 +3493,20 @@
           '?autoplay=1&loop=1&playlist=pMLeQAPhHN8&playsinline=1&controls=1&rel=0';
         host.append(frame);
         host.hidden = false;
-        $('menu-music-toggle').setAttribute('aria-pressed', 'true');
-        $('menu-music-toggle').textContent = 'Tắt nhạc';
         // Loading an iframe does not prove playback; keep the status honest.
         $('menu-music-status').textContent =
-          'Nhấn ▶ trong trình phát nếu nhạc chưa bắt đầu. Chỉnh âm lượng trên YouTube.';
+          'Nhạc được bật khi ở menu. Nếu trình duyệt chặn tự phát, nhấn ▶ bên dưới. Chỉnh âm lượng trong trình phát.';
+      }
+      $('menu-music-toggle').onclick = () => {
+        menuMusicEnabled = !menuMusicEnabled;
+        syncMenuMusic();
       };
       $('menu-music-file-help').hidden = location.protocol !== 'file:';
       window.addEventListener('pagehide', stopMenuMusic);
-      window.addEventListener('offline', () => {
-        const wasOpen = $('menu-music-player').childElementCount > 0;
-        stopMenuMusic();
-        if (wasOpen)
-          $('menu-music-status').textContent =
-            'Mất kết nối. Kết nối Internet rồi bật nhạc lại; gameplay vẫn hoạt động.';
-      });
+      window.addEventListener('pageshow', syncMenuMusic);
+      window.addEventListener('offline', syncMenuMusic);
+      window.addEventListener('online', syncMenuMusic);
+      syncMenuMusic();
 
       /* Small bounded WebAudio cue pool for gameplay; separate from menu music. */
       let audio = null,

@@ -14,15 +14,19 @@ Firefox/Edge dùng API tiêu chuẩn tương thích nhưng chưa được kiểm
 
 ## Nhạc nền menu
 
-Menu có nút **Bật nhạc** cho [bài bro chọn trên YouTube](https://www.youtube.com/watch?v=pMLeQAPhHN8).
-Bấm nút rồi bấm **▶** trong trình phát nếu trình duyệt chưa tự phát. Player hiển
-thị đầy đủ để chỉnh âm lượng/tạm dừng; video lặp trong menu. **Tắt nhạc**, **Vào
-trận**, đổi tab hoặc mất kết nối sẽ gỡ player và dừng nhạc. Khi trở về menu,
-bấm Bật nhạc lại. Nút **Âm** trong trận chỉ điều khiển âm báo gameplay riêng.
+[Bài bro chọn trên YouTube](https://www.youtube.com/watch?v=pMLeQAPhHN8) được nhúng
+ngay trong file HTML: khi mở menu bắt đầu, player tự tải và yêu cầu phát nhạc.
+**Nếu trình duyệt chặn tự phát có tiếng, bấm ▶ ngay trong player.** Player hiển
+thị đầy đủ để chỉnh âm lượng/tạm dừng; video lặp trong menu.
 
-Không có request YouTube trước khi bấm Bật nhạc; không tải MP3 hoặc nhúng bản
-sao bài nhạc vào repo. Gameplay vẫn chạy offline. Khả năng phát phụ thuộc mạng,
-trình duyệt và quyền cho phép nhúng của video trên YouTube.
+**Vào trận**, đổi tab hoặc mất kết nối sẽ gỡ player và dừng nhạc. Khi quay lại
+menu/tab hoặc có mạng trở lại, player tự tải lại nếu nhạc vẫn bật. **Tắt nhạc**
+giữ nhạc tắt qua các lần chuyển này; bấm **Bật nhạc** để bật lại. Lựa chọn áp dụng
+trong phiên mở file hiện tại. Nút **Âm** trong trận chỉ điều khiển âm báo gameplay.
+
+Player tải từ YouTube ngay khi menu hiển thị và đang có mạng; file HTML không
+chứa bản MP3 hoặc bản sao âm thanh offline. Gameplay vẫn chạy offline. Khả năng
+phát phụ thuộc mạng, trình duyệt và quyền cho phép nhúng của video trên YouTube.
 
 **Nếu mở HTML trực tiếp và YouTube báo lỗi 153**, dùng liên kết **Mở bài nhạc
 trên YouTube** ở menu, hoặc chạy HTML qua HTTP để player nhận referrer thực:
@@ -36,7 +40,7 @@ trên YouTube** ở menu, hoặc chạy HTML qua HTTP để player nhận referr
 
    Trên macOS/Linux có thể dùng `python3` thay cho `python`.
 3. Mở [http://localhost:8000/bundschuh_rebellion.html](http://localhost:8000/bundschuh_rebellion.html)
-   rồi bấm **Bật nhạc**. Giữ terminal mở trong lúc chơi; Ctrl+C để dừng server.
+   rồi bấm **▶** trong player nếu cần. Giữ terminal mở trong lúc chơi; Ctrl+C để dừng server.
 
 Bước này chỉ phục vụ nhạc trực tuyến; vẫn có thể mở HTML trực tiếp để chơi game.
 Nếu video không cho phép nhúng hoặc cần đăng nhập, dùng liên kết YouTube trong menu.
@@ -44,6 +48,7 @@ Player dùng `youtube-nocookie.com`, kích thước ít nhất 200×200, control
 `loop=1` và playlist đúng ID video. Không giả mạo origin/referrer để né lỗi 153.
 Tham khảo chính thức: [YouTube player parameters](https://developers.google.com/youtube/player_parameters)
 và [mã lỗi player](https://developers.google.com/youtube/iframe_api_reference#Events).
+Trình duyệt có thể chặn tự phát có tiếng: [Chrome autoplay policy](https://developer.chrome.com/blog/autoplay/).
 
 ## Trận đầu tiên
 

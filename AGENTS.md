@@ -86,9 +86,12 @@ This project is already backed by Git; source and its docs belong in this repo.
 slice, not a Godot Web export. Keep its scenario tuning separate from core
 balance and retain its documented limitations in `demo/README.md`. No CDN,
 remote fonts, external assets or runtime npm dependencies may be required for
-core gameplay. The user-requested YouTube menu track is an optional exception:
-load only after opt-in, keep the player visible, and destroy it before gameplay
-or when the page is hidden. Do not extract audio or spoof referrers.
+core gameplay. The user-requested YouTube menu track is an optional exception.
+The user subsequently requested music directly on the opening menu: create the
+visible player on menu entry and request autoplay, with native Play as the
+browser-policy fallback. Respect Off across menu/visibility/network transitions;
+destroy the player before gameplay or when hidden. Do not extract audio, spoof
+referrers, or claim an iframe load proves playback. Offline gameplay must work.
 
 Combat base stats are embedded from the shared JSON, never hand-edited in HTML:
     python3 tools/sync_browser_demo.py

@@ -32,7 +32,7 @@ liên tiếp; lượt cuối giảm ảnh dư, giữ kiểm tra hành vi đầy 
 thước, hoàn tất toàn bộ 26 checks. Chưa kiểm thử riêng Firefox/Edge, mobile,
 multiplayer, save/load hay performance trên máy cấu hình thấp.
 
-## Cập nhật nhạc menu — 2026-10-13
+## Nhạc menu — bản bật thủ công ban đầu, 2026-10-13
 
 Đã thêm video `pMLeQAPhHN8` qua player YouTube chỉ tải khi người dùng bật.
 `tests/browser_demo_music.cjs` đạt **19 checks** trong Chromium: mặc định không
@@ -53,3 +53,21 @@ Runner dùng response iframe giả được ghi nhãn rõ để kiểm tra adapt
 ảnh ở `test-results/browser-demo-music/`; ảnh fixture không phải ảnh video thực.
 Không coi trạng thái đã mở iframe là đang phát nhạc. Hướng dẫn có cách chạy HTTP
 cho lỗi referrer 153 và liên kết mở video trực tiếp nếu player không phát.
+
+## Nhạc ngay khi mở menu — 2026-10-13
+
+Theo yêu cầu tiếp theo, player giờ tự tải khi menu bắt đầu hiển thị và có mạng,
+với `autoplay=1`. Player có nút Play thật để người dùng bấm nếu trình duyệt chặn
+tự phát có tiếng. Không coi việc tải iframe là bằng chứng nhạc đã phát.
+
+`tests/browser_demo_music.cjs` đã chạy lại và đạt **30 checks**, gồm mở HTML
+offline, tự tạo một player khi vào menu online, loop đúng bài, keyboard Space,
+hủy player khi vào trận/ẩn trang/mất mạng, tự khôi phục khi trở lại menu/tab/có
+mạng, không phát trùng, và giữ lựa chọn Tắt nhạc qua mọi lần chuyển đó. Bố cục
+1440×900 và 1024×768 đã được chụp và xem lại. **17 model cases và 107 Godot/Python
+integration cases đều đạt** trong lần cập nhật này.
+
+YouTube vẫn được thay bằng response giả có nhãn trong bài kiểm tra browser.
+**Chưa xác nhận âm thanh YouTube thực tế hoặc quyền nhúng của video.** Nhạc cần
+Internet; gameplay vẫn chơi offline. File mở trực tiếp có thể cần hướng dẫn
+HTTP/localhost trong README nếu YouTube trả lỗi 153.
