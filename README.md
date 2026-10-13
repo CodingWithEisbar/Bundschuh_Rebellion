@@ -9,6 +9,16 @@ Engine được ghim: **Godot 4.5.2 Standard**, GDScript có kiểu dữ liệu.
 
 Đây là nền prototype có mã nguồn, scene điều khiển và regression tests. Presentation hiện là top-down greybox để kiểm tra gameplay; hướng isometric sprite và art/audio của GDD Phase 4 sẽ được áp dụng ở giai đoạn nội dung.
 
+## Demo một file — mở và chơi ngay
+
+Tải [demo/bundschuh_rebellion.html](demo/bundschuh_rebellion.html) bằng **Download raw file**
+trên GitHub, rồi mở file HTML bằng trình duyệt máy tính. Không cần cài Godot hoặc
+chạy server. Có hai phe, economy, xây nhà, tuyển quân, AI, minimap và thắng/thua.
+
+Đây là bản gameplay Canvas độc lập dùng base stats JSON của repo, không phải bản
+export Godot. [Hướng dẫn và phạm vi demo](demo/README.md) có điều khiển, thông số
+trận thử và cách đồng bộ dữ liệu. Source Godot và các bước chạy bên dưới vẫn giữ nguyên.
+
 ## Chạy trong 5 bước
 
 1. Tải [Godot 4.5.2 Standard](https://godotengine.org/download/archive/4.5.2-stable/) cho Windows/macOS/Linux.

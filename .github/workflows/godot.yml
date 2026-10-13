@@ -18,6 +18,10 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+      - name: Check offline browser demo and shared balance snapshot
+        run: |
+          python3 tools/sync_browser_demo.py --check
+          node tests/browser_demo_model.cjs
       - name: Install pinned Godot standard runtime
         shell: bash
         run: |

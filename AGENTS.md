@@ -79,3 +79,21 @@ engine binaries, temporary screenshots or build output. Avoid adding dependencie
 without an actual requirement. Keep Vietnamese onboarding instructions usable.
 
 This project is already backed by Git; source and its docs belong in this repo.
+
+## Standalone browser gameplay demo
+
+`demo/bundschuh_rebellion.html` is a one-file offline Canvas/JavaScript vertical
+slice, not a Godot Web export. Keep its scenario tuning separate from core
+balance and retain its documented limitations in `demo/README.md`. No CDN,
+remote fonts, external assets or runtime npm dependencies may be required.
+
+Combat base stats are embedded from the shared JSON, never hand-edited in HTML:
+    python3 tools/sync_browser_demo.py
+    python3 tools/sync_browser_demo.py --check
+    node tests/browser_demo_model.cjs
+
+The Node test runner extracts the actual pure model before `MODEL_END`; preserve
+that boundary. `tests/browser_demo_ui.cjs` optionally uses Playwright for real
+file:// offline interaction checks. Its test hook exists only with `?test=1`.
+Keep browser binaries, npm dependencies, screenshots and reports outside tracked
+source. Run model checks for browser changes; retain the Godot validation gate.

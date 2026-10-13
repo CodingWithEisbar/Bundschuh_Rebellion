@@ -1,0 +1,3488 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Bundschuh: Rebellion — một trận RTS thu nhỏ, chạy hoàn toàn offline."
+    />
+    <title>Bundschuh: Rebellion · Black Forest</title>
+    <style>
+      :root {
+        --paper: #e6dabd;
+        --ink: #222b26;
+        --muted: #aab3a3;
+        --gold: #d8b970;
+        --line: #586454;
+        --green: #96be8b;
+        --red: #cf7266;
+        --panel: #202c27f5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #17231e;
+        color: var(--paper);
+        font:
+          14px/1.5 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        color: inherit;
+        cursor: pointer;
+        border: 1px solid #66715a;
+        background: #304037;
+        padding: 8px 13px;
+        transition:
+          background 0.12s,
+          border-color 0.12s;
+      }
+      button:hover {
+        background: #485b44;
+        border-color: var(--gold);
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+      }
+      button:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1,
+      h2,
+      h3,
+      .serif {
+        font-family: Georgia, 'Times New Roman', serif;
+      }
+      kbd {
+        font: 11px monospace;
+        border: 1px solid #64705c;
+        padding: 1px 5px;
+        color: #cbd1bd;
+        border-radius: 2px;
+      }
+      #world {
+        position: absolute;
+        inset: 0;
+        display: block;
+        touch-action: none;
+      }
+      .top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 66px;
+        background: linear-gradient(#1a2724fc, #202d27f5);
+        border-bottom: 1px solid #6b7350;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 0 22px;
+        box-shadow: 0 4px 25px #0003;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        min-width: 190px;
+      }
+      .seal {
+        width: 36px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        background: var(--gold);
+        color: #26352d;
+        clip-path: polygon(0 0, 100% 0, 95% 70%, 50% 100%, 5% 70%);
+        font: 24px Georgia;
+      }
+      .brand strong {
+        font: 17px Georgia;
+        letter-spacing: 2px;
+      }
+      .brand small {
+        display: block;
+        font-size: 9px;
+        letter-spacing: 3px;
+        color: var(--gold);
+      }
+      .resbar {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      .resource {
+        display: grid;
+        grid-template-columns: 23px auto;
+        gap: 0 7px;
+        min-width: 68px;
+      }
+      .resource .icon {
+        grid-row: 1/3;
+        font-size: 24px;
+        color: var(--gold);
+        align-self: center;
+      }
+      .resource b {
+        font-variant-numeric: tabular-nums;
+        font-size: 19px;
+        font-weight: 600;
+        line-height: 1.15;
+      }
+      .resource small {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        color: var(--muted);
+      }
+      .tools {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .tools button {
+        padding: 6px 10px;
+        background: transparent;
+        font-size: 12px;
+      }
+      .clock {
+        font: 13px monospace;
+        color: var(--muted);
+        margin-right: 8px;
+      }
+      .mission {
+        position: absolute;
+        top: 88px;
+        left: 24px;
+        padding: 14px 18px;
+        background: #202c27ed;
+        border: 1px solid #627050;
+        border-left: 3px solid var(--gold);
+        max-width: 345px;
+        pointer-events: none;
+      }
+      .eyebạnw {
+        color: var(--gold);
+        font-size: 10px;
+        letter-spacing: 2.5px;
+        font-weight: 650;
+        text-transform: uppercase;
+      }
+      .mission h2 {
+        font-size: 21px;
+        font-weight: normal;
+        margin: 3px 0;
+      }
+      .mission p {
+        color: #b7c0ad;
+        font-size: 12px;
+      }
+      .mission .sub {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #52604b;
+        color: #d6dfc7;
+      }
+      .enemy-label {
+        position: absolute;
+        right: 22px;
+        top: 87px;
+        text-align: right;
+        text-shadow: 0 2px 4px #000;
+        background: #202c27c9;
+        padding: 8px 12px;
+        font-size: 11px;
+        letter-spacing: 1px;
+      }
+      .enemy-label b {
+        display: block;
+        color: #dc9282;
+        font-size: 12px;
+      }
+      .hud {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        min-height: 152px;
+        display: grid;
+        grid-template-columns: 270px 1fr 214px;
+        gap: 2px;
+        background: #3c4b38;
+        border: 1px solid #788265;
+        box-shadow: 0 8px 30px #0007;
+      }
+      .selection,
+      .commands,
+      .mapbox {
+        background: var(--panel);
+        padding: 15px;
+      }
+      .selection {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+      .portrait {
+        width: 64px;
+        height: 82px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        background: repeating-linear-gradient(135deg, #b9b0850b 0 2px, transparent 2px 6px);
+        border: 1px solid #627050;
+        color: var(--gold);
+        font: 42px Georgia;
+      }
+      .selection h3 {
+        font-size: 19px;
+        line-height: 1.1;
+        margin-bottom: 6px;
+      }
+      .selection p {
+        font-size: 11px;
+        color: #aebca7;
+      }
+      .selection .stat {
+        color: #cfd9bf;
+        margin-top: 5px;
+      }
+      .health {
+        height: 4px;
+        background: #4d5145;
+        margin: 7px 0 5px;
+      }
+      .health i {
+        display: block;
+        background: #8eae72;
+        height: 100%;
+        transition: width 0.1s;
+      }
+      .commands {
+        display: flex;
+        flex-direction: column;
+        padding: 11px 15px;
+        min-width: 0;
+      }
+      .cmd-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.3px;
+        margin-bottom: 7px;
+      }
+      .cmd-row {
+        display: flex;
+        gap: 7px;
+        align-items: stretch;
+        flex-wrap: wrap;
+      }
+      .cmd {
+        min-width: 90px;
+        max-width: 140px;
+        flex: 1;
+        text-align: left;
+        padding: 7px 9px;
+        position: relative;
+        line-height: 1.3;
+      }
+      .cmd b {
+        font-size: 12px;
+        font-weight: 550;
+        display: block;
+      }
+      .cmd small {
+        font-size: 10px;
+        color: #c2c7aa;
+      }
+      .cmd .glyph {
+        color: var(--gold);
+        font: 22px Georgia;
+        float: right;
+        padding-left: 7px;
+      }
+      .quick {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 7px;
+      }
+      .quick button {
+        border: 0;
+        padding: 0;
+        background: none;
+        font-size: 11px;
+        color: #bcc8b2;
+      }
+      .quick button:hover {
+        color: var(--gold);
+      }
+      #queue {
+        font-size: 10px;
+        color: var(--gold);
+        margin-top: 7px;
+        min-height: 14px;
+      }
+      .mapbox {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+      .mapbox span {
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: #c0c9ad;
+      }
+      #minimap {
+        display: block;
+        width: 190px;
+        height: 105px;
+        cursor: crosshair;
+        border: 1px solid #657251;
+        touch-action: none;
+      }
+      .hint {
+        position: absolute;
+        bottom: 184px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1c2b24eb;
+        color: #d3dabe;
+        border: 1px solid #6c7756;
+        padding: 6px 15px;
+        font-size: 11px;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      .toast {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 9px 20px;
+        background: #26352ff5;
+        border: 1px solid var(--gold);
+        font-size: 13px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s;
+        z-index: 12;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+      .veil {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(90deg, #0b1915ee, #0f1e188c);
+        backdrop-filter: blur(3px);
+        padding: 30px;
+      }
+      .veil[hidden] {
+        display: none;
+      }
+      .welcome {
+        max-width: 1000px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 65px;
+        align-items: center;
+      }
+      .title-intro .edition {
+        font-size: 11px;
+        letter-spacing: 4px;
+        color: #c4bd96;
+        margin-bottom: 25px;
+      }
+      .title-intro h1 {
+        font-size: clamp(42px, 5.3vw, 76px);
+        line-height: 0.98;
+        letter-spacing: -2px;
+        color: #ece3c7;
+        font-weight: normal;
+      }
+      .title-intro h1 em {
+        display: block;
+        font-style: normal;
+        color: #ccac68;
+        letter-spacing: 9px;
+        font-size: 0.38em;
+        margin-top: 18px;
+      }
+      .title-intro .rule {
+        width: 65px;
+        height: 2px;
+        background: #c4a060;
+        margin: 28px 0;
+      }
+      .title-intro p {
+        max-width: 420px;
+        color: #c2c9b3;
+        line-height: 1.85;
+        font-size: 14px;
+      }
+      .title-intro footer {
+        margin-top: 35px;
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: #8f9d86;
+      }
+      .setup {
+        background: #1e2c26ed;
+        border: 1px solid #657050;
+        padding: 28px;
+      }
+      .setup h2 {
+        font-weight: normal;
+        font-size: 27px;
+        margin: 3px 0 18px;
+      }
+      .factions {
+        display: grid;
+        gap: 9px;
+      }
+      .faction {
+        padding: 14px 16px;
+        display: flex;
+        gap: 15px;
+        text-align: left;
+        background: #29382f;
+        border-color: #4d5c45;
+      }
+      .faction.active {
+        border-color: #c8ad68;
+        background: #3b4632;
+        box-shadow: inset 3px 0 var(--gold);
+      }
+      .faction .emblem {
+        font: 33px Georgia;
+        width: 32px;
+        color: var(--gold);
+      }
+      .faction strong {
+        font: 20px Georgia;
+        display: block;
+      }
+      .faction small {
+        display: block;
+        color: #b6c3aa;
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .setup .note {
+        font-size: 11px;
+        color: #a9b99f;
+        line-height: 1.7;
+        margin: 17px 0;
+      }
+      .setting {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 12px 0;
+        font-size: 12px;
+        color: #c4cdb5;
+      }
+      .setting input {
+        width: 98px;
+        border: 1px solid #687651;
+        background: #18251f;
+        color: var(--paper);
+        padding: 6px 8px;
+      }
+      .primary {
+        display: block;
+        width: 100%;
+        padding: 13px 18px;
+        background: #d2b477;
+        color: #1b2a22;
+        border-color: #e4c990;
+        font-weight: 650;
+        letter-spacing: 1px;
+      }
+      .primary:hover {
+        background: #e4c990;
+      }
+      .modal {
+        width: min(590px, 95vw);
+        padding: 32px;
+        background: #223127;
+        border: 1px solid #949566;
+        box-shadow: 0 20px 100px #0008;
+      }
+      .modal h2 {
+        font-size: 34px;
+        font-weight: normal;
+        margin: 6px 0 18px;
+      }
+      .modal p {
+        color: #c0cab3;
+        margin: 12px 0;
+      }
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 20px;
+        margin: 22px 0;
+        font-size: 12px;
+      }
+      .controls span {
+        color: #aebda2;
+      }
+      .controls b {
+        display: block;
+        font-weight: normal;
+        color: var(--gold);
+      }
+      .result-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 25px 0;
+      }
+      .result-grid div {
+        padding: 13px;
+        border: 1px solid #5d6c50;
+        text-align: center;
+        color: #acbba1;
+        font-size: 11px;
+      }
+      .result-grid b {
+        display: block;
+        color: var(--gold);
+        font: 27px Georgia;
+      }
+      .mobile-note {
+        display: none;
+        color: #d9bb83;
+        font-size: 11px;
+      }
+      .paused-badge {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 16px 30px;
+        background: #1d2b24e8;
+        border: 1px solid var(--gold);
+        font: 24px Georgia;
+        pointer-events: none;
+      }
+      .paused-badge[hidden] {
+        display: none;
+      }
+      #game-ui[hidden] {
+        display: none;
+      }
+      @media (max-width: 1150px) {
+        .top {
+          gap: 15px;
+          padding: 0 14px;
+        }
+        .brand {
+          min-width: 145px;
+        }
+        .brand strong {
+          font-size: 14px;
+        }
+        .resbar {
+          gap: 12px;
+        }
+        .resource {
+          min-width: 60px;
+        }
+        .hud {
+          grid-template-columns: 230px 1fr 185px;
+          left: 10px;
+          right: 10px;
+          bottom: 10px;
+        }
+        .portrait {
+          width: 42px;
+          height: 65px;
+        }
+        .selection {
+          gap: 10px;
+          padding: 12px;
+        }
+        .selection h3 {
+          font-size: 16px;
+        }
+        #minimap {
+          width: 164px;
+          height: 101px;
+        }
+        .commands {
+          padding: 10px;
+        }
+        .cmd {
+          min-width: 76px;
+          padding: 6px;
+        }
+        .hint {
+          bottom: 181px;
+          font-size: 10px;
+        }
+        .welcome {
+          gap: 30px;
+        }
+        .tools button {
+          padding: 6px;
+        }
+        .resource b {
+          font-size: 17px;
+        }
+      }
+      @media (max-width: 800px), (max-height: 570px) {
+        .brand {
+          display: none;
+        }
+        .resbar {
+          gap: 10px;
+        }
+        .resource {
+          min-width: 50px;
+        }
+        .resource .icon {
+          font-size: 19px;
+        }
+        .resource small {
+          font-size: 8px;
+        }
+        .top {
+          height: 53px;
+          gap: 6px;
+        }
+        .tools .optional {
+          display: none;
+        }
+        .hud {
+          grid-template-columns: 180px 1fr;
+          min-height: 140px;
+        }
+        .mapbox {
+          display: none;
+        }
+        .mission {
+          top: 65px;
+          left: 12px;
+          padding: 8px 12px;
+        }
+        .mission h2 {
+          font-size: 16px;
+        }
+        .mission p {
+          font-size: 10px;
+        }
+        .enemy-label {
+          top: 65px;
+          font-size: 9px;
+          right: 12px;
+        }
+        .welcome {
+          gap: 24px;
+          grid-template-columns: 1fr 1.1fr;
+        }
+        .title-intro h1 {
+          font-size: 36px;
+        }
+        .title-intro p {
+          font-size: 12px;
+        }
+        .title-intro footer {
+          display: none;
+        }
+        .setup {
+          padding: 18px;
+        }
+        .setup h2 {
+          font-size: 22px;
+        }
+        .faction {
+          padding: 8px;
+        }
+        .faction strong {
+          font-size: 16px;
+        }
+        .setup .note {
+          font-size: 10px;
+          margin: 10px 0;
+        }
+        .mobile-note {
+          display: block;
+        }
+        .veil {
+          padding: 20px;
+        }
+        .hint {
+          max-width: 85%;
+          white-space: normal;
+          text-align: center;
+          bottom: 174px;
+        }
+        .selection p {
+          font-size: 10px;
+        }
+        .portrait {
+          display: none;
+        }
+        .cmd {
+          min-width: 72px;
+        }
+        .cmd b {
+          font-size: 11px;
+        }
+        .mission .sub {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="world"
+      aria-label="Chiến trường Black Forest. Dùng chuột chọn quân, click phải ra lệnh."
+    ></canvas>
+    <div id="game-ui" hidden>
+      <header class="top">
+        <div class="brand">
+          <span class="seal">⚑</span>
+          <div><strong>BUNDSCHUH</strong><small>REBELLION · 1525</small></div>
+        </div>
+        <div class="resbar" aria-label="Kho tài nguyên">
+          <div class="resource">
+            <span class="icon">♧</span><b id="r-food">0</b><small>Lương thực</small>
+          </div>
+          <div class="resource">
+            <span class="icon">♜</span><b id="r-wood">0</b><small>Gỗ</small>
+          </div>
+          <div class="resource">
+            <span class="icon">◆</span><b id="r-gold">0</b><small>Vàng</small>
+          </div>
+          <div class="resource">
+            <span class="icon">⬟</span><b id="r-stone">0</b><small>Đá</small>
+          </div>
+          <div class="resource">
+            <span class="icon">♟</span><b id="r-pop">0/0</b><small>Dân số</small>
+          </div>
+        </div>
+        <div class="tools">
+          <span id="clock" class="clock">00:00</span
+          ><button id="speed" title="Thay đổi tốc độ trận">1×</button
+          ><button id="sound" class="optional" title="Bật/tắt âm thanh tổng hợp">Âm: tắt</button
+          ><button id="pause" title="Space">Ⅱ</button
+          ><button id="help" title="Điều khiển">?</button>
+        </div>
+      </header>
+      <aside class="mission">
+        <div class="eyebạnw">Black Forest · Giao tranh tự do</div>
+        <h2>Giành quyền kiểm soát khu rừng</h2>
+        <p>Phá sở chỉ huy địch. Bảo vệ sở chỉ huy của bạn.</p>
+        <p id="objective" class="sub">① Chọn dân → click phải vào lương thực.</p>
+      </aside>
+      <div class="enemy-label">
+        ĐỐI PHƯƠNG<b id="enemy-name">SWABIAN LEAGUE</b
+        ><span id="enemy-status">Đang tập hợp lực lượng</span>
+      </div>
+      <div id="hint" class="hint">
+        Kéo chuột để chọn quân · Click phải ra lệnh · WASD di chuyển camera
+      </div>
+      <section class="hud">
+        <div id="selection" class="selection"></div>
+        <div class="commands">
+          <div class="cmd-head">
+            <span id="cmd-title">Mệnh lệnh</span><span id="faction-label">Bundschuh</span>
+          </div>
+          <div class="cmd-row" id="actions"></div>
+          <div id="queue"></div>
+          <div class="quick">
+            <button id="select-army">⚔ Quân đội <kbd>Tab</kbd></button
+            ><button id="select-idle">♟ Dân rảnh <kbd>V</kbd></button
+            ><button id="home">⌂ Về nhà <kbd>Home</kbd></button
+            ><button id="stop">Dừng <kbd>X</kbd></button>
+          </div>
+        </div>
+        <div class="mapbox">
+          <span>SCHWARZWALD · <span id="map-seed">1524</span></span
+          ><canvas
+            id="minimap"
+            width="380"
+            height="210"
+            aria-label="Bản đồ nhỏ, click để điều hướng"
+          ></canvas>
+        </div>
+      </section>
+      <div id="paused" class="paused-badge" hidden>Tạm dừng · Space để tiếp tục</div>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <section id="start" class="veil">
+      <div class="welcome">
+        <div class="title-intro">
+          <div class="edition">MỘT BIÊN NIÊN SỬ CÓ THỂ CHƠI</div>
+          <h1>Bundschuh<em>REBELLION</em></h1>
+          <div class="rule"></div>
+          <p>
+            Rừng Đen, năm 1525. Dưới những tán thông, một lời thề trở thành cuộc nổi dậy. Xây dựng
+            làng, tập hợp binh sĩ và đưa lá cờ của bạn qua cánh rừng.
+          </p>
+          <footer>RTS GAMEPLAY DEMO &nbsp; / &nbsp; 01 — BLACK FOREST</footer>
+        </div>
+        <div class="setup">
+          <div class="eyebạnw">Chọn một phía của lịch sử</div>
+          <h2>Lá cờ của bạn</h2>
+          <div class="factions">
+            <button class="faction active" data-faction="bundschuh" aria-pressed="true">
+              <span class="emblem">⚑</span
+              ><span
+                ><strong>Liên minh Bundschuh</strong
+                ><small>Bộ binh đông · Giáo chống kỵ binh · Hào khí</small></span
+              >
+            </button>
+            <button class="faction" data-faction="swabian_league" aria-pressed="false">
+              <span class="emblem">♞</span
+              ><span
+                ><strong>Liên minh Swabia</strong
+                ><small>Kỵ binh giáp nặng · Landsknecht · Quân tinh nhuệ</small></span
+              >
+            </button>
+          </div>
+          <p class="note">
+            Một trận nhỏ, khoảng 5–10 phút. Khai thác, xây dựng và tuyển quân để hạ sở chỉ huy đối
+            phương. Cả bản đồ được hé lộ.
+          </p>
+          <label class="setting"
+            >Hạt giống bản đồ
+            <input
+              id="seed"
+              type="number"
+              min="0"
+              max="999999"
+              value="1524"
+              aria-label="Hạt giống bản đồ" /></label
+          ><button id="play" class="primary">VÀO TRẬN &nbsp; →</button>
+          <p class="mobile-note">Thiết kế cho máy tính có chuột và bàn phím.</p>
+        </div>
+      </div>
+    </section>
+    <section id="help-modal" class="veil" hidden>
+      <div class="modal">
+        <div class="eyebạnw">Sổ tay chiến trường</div>
+        <h2>Lệnh từ người chỉ huy</h2>
+        <div class="controls">
+          <div><b>Click / kéo chuột trái</b><span>Chọn một quân / một nhóm</span></div>
+          <div><b>Shift + chọn</b><span>Thêm hoặc bỏ quân khỏi nhóm</span></div>
+          <div><b>Click phải</b><span>Đi, khai thác, xây tiếp hoặc tấn công</span></div>
+          <div><b>W A S D / kéo chuột giữa</b><span>Di chuyển camera · Con lăn zoom</span></div>
+          <div><b>H / B / C</b><span>Chọn dân rồi xây nhà / trại lính / kho</span></div>
+          <div><b>Tab / V / Home</b><span>Chọn quân đội / dân rảnh / về làng</span></div>
+          <div><b>Space / Esc / X</b><span>Tạm dừng / hủy đặt nhà / dừng quân</span></div>
+          <div>
+            <b>Click sở chỉ huy hoặc trại lính</b><span>Tuyển quân; click hàng chờ để hủy</span>
+          </div>
+        </div>
+        <p>
+          Dân mang tối đa 10 tài nguyên, chỉ cộng kho khi giao về. Nhà tăng 5 dân số. Giáo khắc chế
+          kỵ binh; Flailman khắc chế giáo. Preacher tăng 15% tốc đánh và di chuyển trong 6 ô, không
+          cộng dồn.
+        </p>
+        <p>
+          Quân tự đánh địch ở gần khi đứng yên. Lệnh “Tiến công” vừa di chuyển vừa giao chiến. Bản
+          demo dùng âm tổng hợp và đồ họa vẽ bằng mã.
+        </p>
+        <button id="resume" class="primary">TRỞ LẠI CHIẾN TRƯỜNG</button
+        ><button id="new-game" style="width: 100%; margin-top: 10px">
+          Chọn phe lại · Bỏ trận hiện tại
+        </button>
+      </div>
+    </section>
+    <section id="result" class="veil" hidden>
+      <div class="modal">
+        <div id="result-eyebạnw" class="eyebạnw">Kết thúc giao tranh</div>
+        <h2 id="result-title"></h2>
+        <p id="result-text"></p>
+        <div id="result-stats" class="result-grid"></div>
+        <button id="again" class="primary">CHƠI TRẬN MỚI &nbsp; →</button>
+      </div>
+    </section>
+    <!-- Generated from data/balance/units.v1.json by tools/sync_browser_demo.py. -->
+    <script id="balance-data" type="application/json">{"schema_version":1,"balance_id":"phase2_base_stage5_v1","stat_basis":"base_before_faction_and_tech","source_document":"docs/gdd/BUNDSCHUH_REBELLION_GDD_PHASE_2.md sections 4 and 5.1","ruleset_notes":["Base values only: no faction discount, armor, Blacksmith, Elite or other technology modifiers.","Stage 2 overrides: Pikeman +25 vs Cavalry; Preacher 6-tile x1.15 rate aura instead of GDD attack aura.","Heavy Gendarme maps to base Armoured Ritter. All body radii 0.18 and impact fractions 0 retain backend prototype defaults, not historical/GDD measurements.","Recruitment costs are reported, not deducted by scenario spawning. Healing, conversion, charge and relic mechanics are not activated by these records."],"units":[{"id":"peasant_flailman","name":"Peasant Flailman","source_name":"Peasant Flailman","aliases":[],"kind":"FLAILMAN","faction":"bundschuh","age":2,"economy":{"cost":{"food":45,"wood":15,"gold":0,"stone":0},"population":1,"train_seconds":16},"combat":{"hp":45,"attack":7,"damage_type":"melee","armor":{"melee":0,"pierce":0},"armor_classes":["infantry"],"bonus_damage":{"spear":4},"bonus_armor":{},"attack_period":2,"range_tiles":0.5,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":1.1,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"No splash or cavalry bonus. Cost is base 45F/15W; the 39F/15W faction-discounted price is not applied here."},{"id":"radical_preacher","name":"Radical Preacher","source_name":"Radical Preacher","aliases":[],"kind":"RADICAL_PREACHER","faction":"bundschuh","age":3,"economy":{"cost":{"food":0,"wood":0,"gold":100,"stone":0},"population":1,"train_seconds":40},"combat":{"hp":35,"attack":0,"damage_type":"melee","armor":{"melee":0,"pierce":0},"armor_classes":["clergy"],"bonus_damage":{},"bonus_armor":{},"attack_period":0,"range_tiles":0,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":0.85,"body_radius_tiles":0.18},"zeal":{"enabled":true,"radius_tiles":6,"attack_rate_multiplier":1.15,"movement_rate_multiplier":1.15},"notes":"Stage 2 overrides the GDD aura: allied attack/movement rates x1.15 within 6 tiles, sampled every second. GDD healing/relic transport remain unimplemented."},{"id":"landsknecht_pikeman","name":"Landsknecht Pikeman","source_name":"Landsknecht Pikeman","aliases":[],"kind":"LANDSKNECHT","faction":"swabian_league","age":3,"economy":{"cost":{"food":55,"wood":0,"gold":35,"stone":0},"population":1,"train_seconds":26},"combat":{"hp":65,"attack":6,"damage_type":"melee","armor":{"melee":1,"pierce":0},"armor_classes":["infantry","spear"],"bonus_damage":{"cavalry":24},"bonus_armor":{},"attack_period":2,"range_tiles":1,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":0.9,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Base A3 tier; no faction armor, Drill or Elite upgrade. Payroll is a separate scenario setting."},{"id":"heavy_gendarme","name":"Heavy Gendarme","source_name":"Armoured Ritter","aliases":["armoured_ritter"],"kind":"ARMOURED_RITTER","faction":"swabian_league","age":3,"economy":{"cost":{"food":90,"wood":0,"gold":100,"stone":0},"population":1,"train_seconds":38},"combat":{"hp":125,"attack":12,"damage_type":"melee","armor":{"melee":2,"pierce":2},"armor_classes":["cavalry"],"bonus_damage":{},"bonus_armor":{},"attack_period":1.8,"range_tiles":0.5,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":1.3,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Stage 5 display-name alias for Phase 2 Armoured Ritter, not the 150 HP Elite Ritter. No charge, splash, Bloodlines or faction armor."},{"id":"villager","name":"Villager","source_name":"Villager","aliases":[],"kind":"VILLAGER","faction":"either","age":1,"economy":{"cost":{"food":50,"wood":0,"gold":0,"stone":0},"population":1,"train_seconds":25},"combat":{"hp":25,"attack":3,"damage_type":"melee","armor":{"melee":0,"pierce":0},"armor_classes":[],"bonus_damage":{},"bonus_armor":{},"attack_period":2,"range_tiles":0.5,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":0.8,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Combat catalog only; Stage 1 worker navigation/economy is a separate model."},{"id":"pikeman","name":"Pikeman","source_name":"Pikeman","aliases":[],"kind":"PIKEMAN","faction":"either","age":3,"economy":{"cost":{"food":35,"wood":25,"gold":0,"stone":0},"population":1,"train_seconds":22},"combat":{"hp":55,"attack":4,"damage_type":"melee","armor":{"melee":0,"pierce":0},"armor_classes":["infantry","spear"],"bonus_damage":{"cavalry":25},"bonus_armor":{},"attack_period":3,"range_tiles":0.5,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":1,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Explicit Stage 2 +25 Cavalry override; Phase 2 listed +22."},{"id":"crossbowman","name":"Crossbowman","source_name":"Crossbowman","aliases":[],"kind":"CROSSBOWMAN","faction":"either","age":3,"economy":{"cost":{"food":0,"wood":25,"gold":45,"stone":0},"population":1,"train_seconds":27},"combat":{"hp":45,"attack":5,"damage_type":"pierce","armor":{"melee":0,"pierce":0},"armor_classes":["archer"],"bonus_damage":{},"bonus_armor":{},"attack_period":2,"range_tiles":5,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":0.96,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Base ranged tier; no projectile travel or accuracy model."},{"id":"skirmisher","name":"Skirmisher","source_name":"Skirmisher","aliases":[],"kind":"SKIRMISHER","faction":"either","age":2,"economy":{"cost":{"food":25,"wood":35,"gold":0,"stone":0},"population":1,"train_seconds":22},"combat":{"hp":35,"attack":2,"damage_type":"pierce","armor":{"melee":0,"pierce":3},"armor_classes":["archer"],"bonus_damage":{"archer":3,"spear":2},"bonus_armor":{},"attack_period":3,"range_tiles":4,"minimum_range_tiles":1,"impact_fraction":0},"movement":{"speed_tiles_per_second":0.96,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Minimum range is one tile; not the Elite tier."},{"id":"arquebusier","name":"Arquebusier","source_name":"Arquebusier","aliases":[],"kind":"ARQUEBUSIER","faction":"either","age":3,"economy":{"cost":{"food":45,"wood":0,"gold":55,"stone":0},"population":1,"train_seconds":34},"combat":{"hp":45,"attack":16,"damage_type":"pierce","armor":{"melee":0,"pierce":0},"armor_classes":["archer"],"bonus_damage":{"infantry":6},"bonus_armor":{},"attack_period":3.5,"range_tiles":6,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":0.85,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Pierce channel; no true damage or League reload bonus applied."},{"id":"light_cavalry","name":"Light Cavalry","source_name":"Light Cavalry","aliases":[],"kind":"LIGHT_CAVALRY","faction":"either","age":3,"economy":{"cost":{"food":80,"wood":0,"gold":0,"stone":0},"population":1,"train_seconds":30},"combat":{"hp":80,"attack":7,"damage_type":"melee","armor":{"melee":0,"pierce":2},"armor_classes":["cavalry"],"bonus_damage":{"clergy":8},"bonus_armor":{},"attack_period":2,"range_tiles":0.5,"minimum_range_tiles":0,"impact_fraction":0},"movement":{"speed_tiles_per_second":1.5,"body_radius_tiles":0.18},"zeal":{"enabled":false,"radius_tiles":0,"attack_rate_multiplier":1,"movement_rate_multiplier":1},"notes":"Base tier before Bloodlines/Husbandry."}],"source_sha256":"a003cc27a4343aeb8be1a1250420c9f3450c1618b7ff42fa539e6427783a0641"}</script>
+    <script>
+      'use strict';
+      /* Standalone browser vertical slice. The Godot project remains the authoritative
+   simulation. Pure Game below has no DOM, audio, or wall-clock dependencies. */
+      const BALANCE = JSON.parse(document.getElementById('balance-data').textContent);
+      const STATS = Object.fromEntries(BALANCE.units.map((u) => [u.id, u]));
+      const W = 42,
+        H = 30,
+        STEP = 0.05,
+        RES = ['food', 'wood', 'gold', 'stone'];
+      const NAMES = {
+        villager: 'Dân làng',
+        peasant_flailman: 'Flailman',
+        pikeman: 'Lính giáo',
+        radical_preacher: 'Preacher',
+        landsknecht_pikeman: 'Landsknecht',
+        heavy_gendarme: 'Gendarme',
+        crossbowman: 'Lính nỏ',
+      };
+      const GLYPHS = {
+        villager: '♟',
+        peasant_flailman: '⚒',
+        pikeman: '♜',
+        radical_preacher: '✢',
+        landsknecht_pikeman: '⚔',
+        heavy_gendarme: '♞',
+        crossbowman: '⌁',
+        house: '⌂',
+        barracks: '⚑',
+        camp: '▤',
+        town: '♜',
+      };
+      const FACTIONS = { bundschuh: 'Bundschuh', swabian_league: 'Swabian League' };
+      const BUILD = {
+        town: { name: 'Sở chỉ huy', size: 3, hp: 1800, work: 0, cost: {}, pop: 20 },
+        house: { name: 'Nhà dân', size: 2, hp: 400, work: 25, cost: { wood: 25 }, pop: 5 },
+        barracks: { name: 'Trại lính', size: 2, hp: 900, work: 40, cost: { wood: 175 }, pop: 0 },
+        camp: { name: 'Kho tài nguyên', size: 2, hp: 500, work: 30, cost: { wood: 100 }, pop: 0 },
+      };
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v)),
+        dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y),
+        key = (x, y) => y * W + x;
+      function rng(seed) {
+        let s = seed >>> 0;
+        return () => {
+          s += 0x6d2b79f5;
+          let t = Math.imul(s ^ (s >>> 15), 1 | s);
+          t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      class Heap {
+        constructor() {
+          this.a = [];
+        }
+        push(v, p) {
+          const a = this.a;
+          let i = a.length;
+          a.push({ v, p });
+          while (i) {
+            const j = (i - 1) >> 1;
+            if (a[j].p <= p) break;
+            a[i] = a[j];
+            i = j;
+          }
+          a[i] = { v, p };
+        }
+        pop() {
+          const a = this.a,
+            r = a[0],
+            last = a.pop();
+          if (a.length) {
+            let i = 0;
+            while (i * 2 + 1 < a.length) {
+              let j = i * 2 + 1;
+              if (j + 1 < a.length && a[j + 1].p < a[j].p) j++;
+              if (a[j].p >= last.p) break;
+              a[i] = a[j];
+              i = j;
+            }
+            a[i] = last;
+          }
+          return r.v;
+        }
+        get length() {
+          return this.a.length;
+        }
+      }
+      class SpatialHash {
+        constructor() {
+          this.cells = new Map();
+        }
+        rebuild(units) {
+          this.cells.clear();
+          for (const u of units)
+            if (u.hp > 0) {
+              const k = `${Math.floor(u.x / 2)},${Math.floor(u.y / 2)}`;
+              if (!this.cells.has(k)) this.cells.set(k, []);
+              this.cells.get(k).push(u);
+            }
+        }
+        near(x, y, r) {
+          const out = [];
+          for (let b = Math.floor((y - r) / 2); b <= Math.floor((y + r) / 2); b++)
+            for (let a = Math.floor((x - r) / 2); a <= Math.floor((x + r) / 2); a++) {
+              const list = this.cells.get(`${a},${b}`);
+              if (list)
+                for (const u of list)
+                  if (u.hp > 0 && Math.hypot(u.x - x, u.y - y) <= r) out.push(u);
+            }
+          return out;
+        }
+      }
+      class Game {
+        constructor(faction = 'bundschuh', seed = 1524) {
+          this.seed = seed;
+          this.random = rng(seed);
+          this.time = 0;
+          this.tick = 0;
+          this.nextId = 1;
+          this.units = [];
+          this.buildings = [];
+          this.resources = [];
+          this.byId = new Map();
+          this.blocks = new Map();
+          this.terrain = new Uint8Array(W * H);
+          this.spatial = new SpatialHash();
+          this.events = [];
+          this.effects = [];
+          this.result = null;
+          this.navRevision = 0;
+          this.pathBudget = 8;
+          this.lastWave = 0;
+          this.nextWave = 150;
+          this.nextRecruit = 35;
+          this.aiRoster = 0;
+          this.players = [
+            { faction, bank: { food: 450, wood: 400, gold: 260, stone: 100 } },
+            {
+              faction: faction === 'bundschuh' ? 'swabian_league' : 'bundschuh',
+              bank: { food: 400, wood: 250, gold: 250, stone: 0 },
+            },
+          ];
+          this.metrics = { gathered: 0, kills: 0, lost: 0, built: 0, trained: 0 };
+          this.generate();
+          this.spatial.rebuild(this.units);
+        }
+        add(e) {
+          e.id = this.nextId++;
+          this.byId.set(e.id, e);
+          return e;
+        }
+        emit(type, text) {
+          this.events.push({ type, text });
+        }
+        footprint(e) {
+          const a = [];
+          for (let y = e.gy; y < e.gy + e.size; y++)
+            for (let x = e.gx; x < e.gx + e.size; x++) a.push(key(x, y));
+          return a;
+        }
+        free(x, y) {
+          return x >= 1 && y >= 1 && x < W - 1 && y < H - 1 && !this.blocks.has(key(x, y));
+        }
+        resource(type, x, y, amount) {
+          if (this.blocks.has(key(x, y))) return null;
+          const e = this.add({
+            entity: 'resource',
+            type,
+            x: x + 0.5,
+            y: y + 0.5,
+            gx: x,
+            gy: y,
+            size: 1,
+            amount,
+            original: amount,
+            variant: Math.floor(this.random() * 4),
+          });
+          this.resources.push(e);
+          this.blocks.set(key(x, y), e);
+          return e;
+        }
+        building(type, owner, x, y, complete = true) {
+          const d = BUILD[type],
+            e = this.add({
+              entity: 'building',
+              type,
+              owner,
+              gx: x,
+              gy: y,
+              size: d.size,
+              x: x + d.size / 2,
+              y: y + d.size / 2,
+              hp: complete ? d.hp : 0,
+              maxHp: d.hp,
+              complete,
+              work: complete ? d.work : 0,
+              queue: [],
+              dead: false,
+            });
+          this.buildings.push(e);
+          for (const k of this.footprint(e)) this.blocks.set(k, e);
+          this.navRevision++;
+          return e;
+        }
+        spawn(type, owner, x, y) {
+          const d = STATS[type];
+          const u = this.add({
+            entity: 'unit',
+            type,
+            owner,
+            x,
+            y,
+            hp: d.combat.hp,
+            maxHp: d.combat.hp,
+            data: d,
+            order: { type: 'idle' },
+            path: [],
+            goal: null,
+            navRevision: -1,
+            repath: 0,
+            cool: 0,
+            buff: 1,
+            attackRate: 1,
+            cargo: { type: null, amount: 0 },
+            gatherWork: 0,
+            phase: 'idle',
+            target: null,
+            attackTime: -99,
+            moving: false,
+            blocked: 0,
+          });
+          this.units.push(u);
+          return u;
+        }
+        generate() {
+          // Seeded terrain with protected three-tile roads and two guaranteed base clearings.
+          const forest = new Uint8Array(W * H);
+          for (let y = 1; y < H - 1; y++)
+            for (let x = 1; x < W - 1; x++) forest[key(x, y)] = this.random() < 0.57 ? 1 : 0;
+          for (let pass = 0; pass < 2; pass++) {
+            const prev = forest.slice();
+            for (let y = 1; y < H - 1; y++)
+              for (let x = 1; x < W - 1; x++) {
+                let n = 0;
+                for (let dy = -1; dy <= 1; dy++)
+                  for (let dx = -1; dx <= 1; dx++) n += prev[key(x + dx, y + dy)] || 0;
+                forest[key(x, y)] = n >= 5 ? 1 : 0;
+              }
+          }
+          for (let y = 0; y < H; y++)
+            for (let x = 0; x < W; x++) {
+              const road =
+                [8, 15, 23].some((r) => Math.abs(y - r) <= 1) ||
+                ((Math.abs(x - 8) <= 1 || Math.abs(x - 33) <= 1) && y >= 7 && y <= 24);
+              const clearing = ((x >= 2 && x <= 14) || (x >= 27 && x <= 39)) && y >= 9 && y <= 21;
+              const border = x < 1 || y < 1 || x >= W - 1 || y >= H - 1;
+              this.terrain[key(x, y)] = road ? 1 : 0;
+              if (border || (!road && !clearing && (forest[key(x, y)] || (x >= 19 && x <= 22))))
+                this.resource('wood', x, y, 120);
+            }
+          this.building('town', 0, 5, 14);
+          this.building('barracks', 0, 11, 17);
+          this.building('town', 1, 33, 14);
+          this.building('barracks', 1, 28, 17);
+          for (const side of [0, 1]) {
+            const mirror = (x) => (side ? W - 1 - x : x);
+            for (const [type, x, y, n] of [
+              ['food', 4, 11, 1400],
+              ['food', 5, 11, 1400],
+              ['gold', 11, 11, 1200],
+              ['gold', 12, 11, 1200],
+              ['stone', 12, 20, 600],
+              ['wood', 3, 18, 500],
+              ['wood', 3, 19, 500],
+            ])
+              this.resource(type, mirror(x), y, n);
+            for (let i = 0; i < 8; i++)
+              this.spawn(
+                'villager',
+                side,
+                mirror(5 + (i % 4)) + 0.5,
+                19.5 + Math.floor(i / 4) * 0.65,
+              );
+            const faction = this.players[side].faction;
+            const starters =
+              faction === 'bundschuh'
+                ? [
+                    'peasant_flailman',
+                    'peasant_flailman',
+                    'peasant_flailman',
+                    'pikeman',
+                    'pikeman',
+                    'radical_preacher',
+                  ]
+                : ['heavy_gendarme', 'landsknecht_pikeman', 'landsknecht_pikeman', 'crossbowman'];
+            starters.forEach((t, i) =>
+              this.spawn(
+                t,
+                side,
+                mirror(10) + 0.5 + (side ? -1 : 1) * (i % 3) * 0.65,
+                14 + Math.floor(i / 3) * 0.7,
+              ),
+            );
+          }
+          // An explicit AI uses finite resources, paid recruitment, and the same economy.
+          const workers = this.units.filter((u) => u.owner === 1 && u.type === 'villager');
+          workers.forEach((u, i) => {
+            const type = i < 4 ? 'food' : i < 6 ? 'gold' : 'wood';
+            const r = this.nearestResource(u, type);
+            if (r) this.order([u], 'gather', r);
+          });
+        }
+        population(owner) {
+          return (
+            this.units.filter((u) => u.owner === owner && u.hp > 0).length +
+            this.buildings
+              .filter((b) => b.owner === owner && !b.dead)
+              .reduce((s, b) => s + b.queue.length, 0)
+          );
+        }
+        cap(owner) {
+          return Math.min(
+            100,
+            this.buildings
+              .filter((b) => b.owner === owner && b.complete && !b.dead)
+              .reduce((s, b) => s + BUILD[b.type].pop, 0),
+          );
+        }
+        canPay(owner, cost) {
+          return RES.every((r) => this.players[owner].bank[r] >= (cost[r] || 0));
+        }
+        pay(owner, cost, mul = -1) {
+          for (const r of RES) this.players[owner].bank[r] += mul * (cost[r] || 0);
+        }
+        roster(owner) {
+          return this.players[owner].faction === 'bundschuh'
+            ? ['peasant_flailman', 'pikeman', 'crossbowman', 'radical_preacher']
+            : ['landsknecht_pikeman', 'heavy_gendarme', 'crossbowman', 'pikeman'];
+        }
+        recruit(b, type) {
+          if (
+            !b ||
+            b.dead ||
+            !b.complete ||
+            !(
+              (b.type === 'town' && type === 'villager') ||
+              (b.type === 'barracks' && this.roster(b.owner).includes(type))
+            )
+          )
+            return false;
+          const d = STATS[type];
+          if (
+            b.queue.length >= 8 ||
+            this.population(b.owner) >= this.cap(b.owner) ||
+            !this.canPay(b.owner, d.economy.cost)
+          )
+            return false;
+          this.pay(b.owner, d.economy.cost);
+          b.queue.push({ type, progress: 0 });
+          return true;
+        }
+        cancelRecruit(b, index) {
+          if (!b || b.dead || index < 0 || index >= b.queue.length) return;
+          const q = b.queue.splice(index, 1)[0];
+          this.pay(b.owner, STATS[q.type].economy.cost, 1);
+        }
+        placement(type, x, y, owner) {
+          const d = BUILD[type];
+          if (!d || type === 'town') return 'Loại công trình không hợp lệ';
+          if (!this.canPay(owner, d.cost)) return 'Không đủ tài nguyên';
+          if (x < 1 || y < 1 || x + d.size >= W || y + d.size >= H) return 'Ngoài bản đồ';
+          for (let dy = 0; dy < d.size; dy++)
+            for (let dx = 0; dx < d.size; dx++) {
+              if (!this.free(x + dx, y + dy)) return 'Có cây, mỏ hoặc công trình';
+              if (this.terrain[key(x + dx, y + dy)] === 1) return 'Giữ thông hành lang chính';
+            }
+          if (
+            this.units.some(
+              (u) =>
+                u.hp > 0 &&
+                u.x > x - 0.2 &&
+                u.x < x + d.size + 0.2 &&
+                u.y > y - 0.2 &&
+                u.y < y + d.size + 0.2,
+            )
+          )
+            return 'Có quân trong nền xây';
+          if (
+            !this.buildings.some(
+              (b) =>
+                b.owner === owner &&
+                !b.dead &&
+                b.complete &&
+                dist(b, { x: x + d.size / 2, y: y + d.size / 2 }) < 12,
+            )
+          )
+            return 'Xây trong vòng 12 ô quanh làng';
+          return '';
+        }
+        place(type, x, y, workers) {
+          workers = workers.filter((u) => u.hp > 0 && u.type === 'villager' && u.owner === 0);
+          if (!workers.length) return null;
+          if (this.placement(type, x, y, 0)) return null;
+          const probe = { gx: x, gy: y, size: BUILD[type].size, x: x + 1, y: y + 1 };
+          if (!workers.some((u) => this.interactionPath(u, probe))) return null;
+          this.pay(0, BUILD[type].cost);
+          const b = this.building(type, 0, x, y, false);
+          this.order(workers, 'build', b);
+          this.emit('build', `Đã đặt ${BUILD[type].name.toLowerCase()}`);
+          return b;
+        }
+        nearestResource(u, type) {
+          return (
+            this.resources
+              .filter((r) => r.amount > 0 && r.type === type)
+              .sort((a, b) => dist(u, a) - dist(u, b))[0] || null
+          );
+        }
+        order(units, type, target) {
+          let slot = 0;
+          for (const u of units) {
+            if (u.hp <= 0) continue;
+            u.path = [];
+            u.goal = null;
+            u.repath = 0;
+            u.target = null;
+            u.phase = 'idle';
+            u.order = { type, target: (target && target.id) || null };
+            if (type === 'move' || type === 'advance') {
+              const n = slot++,
+                a = n * 2.399963,
+                rad = 0.48 * Math.sqrt(n);
+              const point = {
+                x: clamp(target.x + Math.cos(a) * rad, 1.5, W - 1.5),
+                y: clamp(target.y + Math.sin(a) * rad, 1.5, H - 1.5),
+              };
+              u.order.point = this.nearestFree(point) || { x: u.x, y: u.y };
+            } else if (type === 'gather') {
+              u.order.resourceType = target.type;
+              u.phase = u.cargo.amount ? 'return' : 'resource';
+            } else if (type === 'build') u.phase = 'build';
+          }
+        }
+        nearestFree(p) {
+          for (let r = 0; r <= 6; r++)
+            for (let dy = -r; dy <= r; dy++)
+              for (let dx = -r; dx <= r; dx++) {
+                if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+                const x = Math.floor(p.x) + dx,
+                  y = Math.floor(p.y) + dy;
+                if (this.free(x, y)) return { x: x + 0.5, y: y + 0.5 };
+              }
+          return null;
+        }
+        path(start, end) {
+          const sx = Math.floor(start.x),
+            sy = Math.floor(start.y),
+            ex = Math.floor(end.x),
+            ey = Math.floor(end.y);
+          if (!this.free(ex, ey)) return null;
+          const a = key(sx, sy),
+            z = key(ex, ey);
+          if (a === z) return [end];
+          const heap = new Heap(),
+            g = new Float64Array(W * H).fill(Infinity),
+            prev = new Int32Array(W * H).fill(-1),
+            seen = new Uint8Array(W * H);
+          g[a] = 0;
+          heap.push(a, 0);
+          while (heap.length) {
+            const k = heap.pop();
+            if (seen[k]) continue;
+            seen[k] = 1;
+            if (k === z) {
+              const points = [end];
+              let j = k;
+              while (prev[j] !== a && prev[j] >= 0) {
+                j = prev[j];
+                points.push({ x: (j % W) + 0.5, y: Math.floor(j / W) + 0.5 });
+              }
+              return points.reverse();
+            }
+            const x = k % W,
+              y = Math.floor(k / W);
+            for (const [dx, dy] of [
+              [1, 0],
+              [-1, 0],
+              [0, 1],
+              [0, -1],
+              [1, 1],
+              [1, -1],
+              [-1, 1],
+              [-1, -1],
+            ]) {
+              const xx = x + dx,
+                yy = y + dy;
+              if (
+                !this.free(xx, yy) ||
+                (dx && dy && (!this.free(x + dx, y) || !this.free(x, y + dy)))
+              )
+                continue;
+              const j = key(xx, yy),
+                ng = g[k] + (dx && dy ? Math.SQRT2 : 1);
+              if (ng >= g[j]) continue;
+              g[j] = ng;
+              prev[j] = k;
+              heap.push(j, ng + Math.hypot(ex - xx, ey - yy));
+            }
+          }
+          return null;
+        }
+        perimeter(e) {
+          const result = [];
+          for (let y = e.gy - 1; y <= e.gy + e.size; y++)
+            for (let x = e.gx - 1; x <= e.gx + e.size; x++) {
+              if (x >= e.gx && x < e.gx + e.size && y >= e.gy && y < e.gy + e.size) continue;
+              if (this.free(x, y)) result.push({ x: x + 0.5, y: y + 0.5 });
+            }
+          return result;
+        }
+        interactionPath(u, e) {
+          const goals = this.perimeter(e).sort((a, b) => dist(u, a) - dist(u, b));
+          for (const p of goals) {
+            const path = this.path(u, p);
+            if (path) return path;
+          }
+          return null;
+        }
+        distanceTo(u, e) {
+          if (e.entity === 'unit')
+            return Math.max(
+              0,
+              dist(u, e) - u.data.movement.body_radius_tiles - e.data.movement.body_radius_tiles,
+            );
+          return Math.hypot(
+            Math.max(e.gx - u.x, 0, u.x - e.gx - e.size),
+            Math.max(e.gy - u.y, 0, u.y - e.gy - e.size),
+          );
+        }
+        walk(u, goal, dt) {
+          if (dist(u, goal) < 0.08) {
+            u.path = [];
+            return true;
+          }
+          u.repath -= dt;
+          if (
+            !u.goal ||
+            dist(u.goal, goal) > 0.6 ||
+            u.navRevision !== this.navRevision ||
+            (!u.path.length && u.repath <= 0)
+          ) {
+            if (this.pathBudget <= 0) return false;
+            this.pathBudget--;
+            u.path = this.path(u, goal) || [];
+            u.goal = { ...goal };
+            u.navRevision = this.navRevision;
+            u.repath = 0.65;
+          }
+          if (!u.path.length) return false;
+          const p = u.path[0],
+            dd = dist(u, p);
+          if (dd < 0.07) {
+            u.path.shift();
+            return false;
+          }
+          const step = Math.min(dd, u.data.movement.speed_tiles_per_second * u.buff * dt),
+            dx = (p.x - u.x) / dd,
+            dy = (p.y - u.y) / dd;
+          const near = this.spatial.near(u.x, u.y, 0.9);
+          const safe = (x, y) => {
+            if (!this.free(Math.floor(x), Math.floor(y))) return false;
+            const r = u.data.movement.body_radius_tiles;
+            for (const [xx, yy] of [
+              [x - r, y],
+              [x + r, y],
+              [x, y - r],
+              [x, y + r],
+            ])
+              if (!this.free(Math.floor(xx), Math.floor(yy))) return false;
+            return near.every(
+              (v) =>
+                v === u ||
+                dist(v, { x, y }) >=
+                  u.data.movement.body_radius_tiles + v.data.movement.body_radius_tiles - 0.008,
+            );
+          };
+          let moved = false;
+          for (const angle of [0, 0.8, -0.8, 1.35, -1.35]) {
+            const ca = Math.cos(angle),
+              sa = Math.sin(angle),
+              x = u.x + (dx * ca - dy * sa) * step,
+              y = u.y + (dx * sa + dy * ca) * step;
+            if (safe(x, y)) {
+              u.x = x;
+              u.y = y;
+              moved = true;
+              break;
+            }
+          }
+          u.moving = moved;
+          u.blocked = moved ? 0 : u.blocked + dt;
+          if (u.blocked > 1) {
+            u.path = [];
+            u.repath = 0;
+            u.blocked = 0;
+          }
+          return dist(u, goal) < 0.08;
+        }
+        approach(u, e, dt, range = 0.78) {
+          if (this.distanceTo(u, e) <= range) return true;
+          let goal;
+          if (e.entity === 'unit') {
+            const dx = u.x - e.x,
+              dy = u.y - e.y,
+              dd = Math.hypot(dx, dy) || 1;
+            const aim = { x: e.x + (dx / dd) * 0.7, y: e.y + (dy / dd) * 0.7 };
+            goal = this.free(Math.floor(aim.x), Math.floor(aim.y)) ? aim : this.nearestFree(aim);
+          } else {
+            const choices = this.perimeter(e);
+            choices.sort((a, b) => {
+              const occupied = (p) =>
+                this.spatial.near(p.x, p.y, 0.38).some((v) => v !== u) ? 6 : 0;
+              return dist(u, a) + occupied(a) - dist(u, b) - occupied(b);
+            });
+            goal = choices[0];
+            if (goal && range < 0.7) {
+              const dd = dist(goal, e) || 1;
+              goal = {
+                x: goal.x + ((e.x - goal.x) / dd) * 0.32,
+                y: goal.y + ((e.y - goal.y) / dd) * 0.32,
+              };
+            }
+          }
+          if (goal) this.walk(u, goal, dt);
+          return false;
+        }
+        gather(u, dt) {
+          let r = this.byId.get(u.order.target);
+          if (u.phase === 'return') {
+            if (!u.cargo.amount) {
+              u.phase = 'resource';
+              return;
+            }
+            const candidates = this.buildings
+              .filter(
+                (b) =>
+                  b.owner === u.owner &&
+                  b.complete &&
+                  !b.dead &&
+                  (b.type === 'town' || b.type === 'camp'),
+              )
+              .sort((a, b) => dist(u, a) - dist(u, b));
+            const b = candidates[0];
+            if (!b) return;
+            if (this.approach(u, b, dt)) {
+              this.players[u.owner].bank[u.cargo.type] += u.cargo.amount;
+              if (u.owner === 0) this.metrics.gathered += u.cargo.amount;
+              u.cargo = { type: null, amount: 0 };
+              u.phase = 'resource';
+              u.path = [];
+            }
+            return;
+          }
+          if (!r || r.amount <= 0) {
+            r = this.nearestResource(u, u.order.resourceType);
+            if (!r) {
+              u.order = { type: 'idle' };
+              return;
+            }
+            u.order.target = r.id;
+            u.path = [];
+          }
+          if (!this.approach(u, r, dt)) return;
+          u.phase = 'gather';
+          // Demo economy is accelerated to 2 whole resource units per game second.
+          const bonus =
+            this.players[u.owner].faction === 'bundschuh' && ['food', 'wood'].includes(r.type)
+              ? 1.1
+              : 1;
+          u.gatherWork += dt * 2 * bonus;
+          while (u.gatherWork >= 1 && r.amount > 0 && u.cargo.amount < 10) {
+            u.gatherWork--;
+            r.amount--;
+            u.cargo.type = r.type;
+            u.cargo.amount++;
+          }
+          if (!r.amount) {
+            this.blocks.delete(key(r.gx, r.gy));
+            this.navRevision++;
+          }
+          if (u.cargo.amount >= 10 || !r.amount) {
+            u.phase = 'return';
+            u.gatherWork = 0;
+            u.path = [];
+          }
+        }
+        damage(u, t) {
+          const c = u.data.combat;
+          if (c.attack <= 0) return 0;
+          const tc =
+            t.entity === 'unit'
+              ? t.data.combat
+              : { armor: { melee: 2, pierce: 4 }, armor_classes: [], bonus_armor: {} };
+          let n = Math.max(1, c.attack - tc.armor[c.damage_type]);
+          for (const tag of new Set(tc.armor_classes))
+            n += Math.max(0, (c.bonus_damage[tag] || 0) - (tc.bonus_armor[tag] || 0));
+          return n;
+        }
+        targetFor(u, radius = 5) {
+          return (
+            this.spatial
+              .near(u.x, u.y, radius)
+              .filter((t) => t.owner !== u.owner)
+              .sort((a, b) => dist(u, a) - dist(u, b))[0] || null
+          );
+        }
+        combat(u, t, dt, hits) {
+          if (!t || t.dead || (t.hp <= 0 && t.entity === 'unit')) return false;
+          const c = u.data.combat;
+          const range =
+            c.damage_type === 'pierce' && t.entity === 'unit' ? dist(u, t) : this.distanceTo(u, t);
+          if (range <= c.range_tiles && range >= c.minimum_range_tiles) {
+            u.path = [];
+            u.phase = 'attack';
+            if (u.cool <= 0) {
+              u.cool = c.attack_period;
+              u.attackTime = this.time;
+              hits.push({ source: u, target: t, damage: this.damage(u, t) });
+            }
+            return true;
+          }
+          this.approach(
+            u,
+            t,
+            dt,
+            c.damage_type === 'pierce' ? Math.max(0.5, c.range_tiles - 0.7) : c.range_tiles,
+          );
+          return true;
+        }
+        step(dt = STEP) {
+          if (this.result) return;
+          this.tick++;
+          this.time = this.tick * STEP;
+          this.pathBudget = 8;
+          this.spatial.rebuild(this.units);
+          if (this.tick % 20 === 0) {
+            for (const u of this.units)
+              if (u.hp > 0) {
+                u.buff = 1;
+                u.attackRate = 1;
+              }
+            for (const p of this.units)
+              if (p.hp > 0 && p.data.zeal.enabled)
+                for (const u of this.spatial.near(p.x, p.y, p.data.zeal.radius_tiles))
+                  if (u.owner === p.owner) {
+                    u.buff = p.data.zeal.movement_rate_multiplier;
+                    u.attackRate = p.data.zeal.attack_rate_multiplier;
+                  }
+            this.ai();
+          }
+          const hits = [];
+          for (const u of this.units) {
+            if (u.hp <= 0) continue;
+            u.moving = false;
+            u.cool = Math.max(0, u.cool - dt * u.attackRate);
+            const o = u.order;
+            if (o.type === 'gather' && u.type === 'villager') {
+              this.gather(u, dt);
+              continue;
+            }
+            if (o.type === 'build' && u.type === 'villager') {
+              const b = this.byId.get(o.target);
+              if (!b || b.dead || b.complete) {
+                u.order = { type: 'idle' };
+                continue;
+              }
+              if (this.approach(u, b, dt)) {
+                u.phase = 'build';
+                const work = Math.min(dt, BUILD[b.type].work - b.work);
+                b.work += work;
+                b.hp = Math.min(b.maxHp, b.hp + (b.maxHp * work) / BUILD[b.type].work);
+                if (b.work >= BUILD[b.type].work - 1e-8) {
+                  b.complete = true;
+                  if (b.owner === 0) {
+                    this.metrics.built++;
+                    this.emit('complete', `${BUILD[b.type].name} đã hoàn tất`);
+                  }
+                }
+              }
+              continue;
+            }
+            if (o.type === 'move') {
+              u.phase = 'move';
+              if (this.walk(u, o.point, dt)) u.order = { type: 'idle' };
+              continue;
+            }
+            if (o.type === 'hold') {
+              const t = this.targetFor(u, u.data.combat.range_tiles + 0.36);
+              if (t && u.data.combat.attack > 0) {
+                const d =
+                  u.data.combat.damage_type === 'pierce' ? dist(u, t) : this.distanceTo(u, t);
+                if (d <= u.data.combat.range_tiles) this.combat(u, t, dt, hits);
+              }
+              continue;
+            }
+            let target = null;
+            if (o.type === 'attack') {
+              target = this.byId.get(o.target);
+              if (!target || target.dead || (target.entity === 'unit' && target.hp <= 0)) {
+                u.order = { type: 'idle' };
+                target = null;
+              }
+            }
+            if (target && target.entity === 'building') target = this.targetFor(u, 4) || target;
+            if (
+              u.data.combat.attack > 0 &&
+              o.type !== 'hold' &&
+              (u.type !== 'villager' || o.type === 'attack')
+            ) {
+              if (!target) {
+                const old = this.byId.get(u.target),
+                  near = this.targetFor(u);
+                target =
+                  old &&
+                  old.hp > 0 &&
+                  dist(u, old) <= 7 &&
+                  (!near || dist(u, old) <= dist(u, near) + 0.4)
+                    ? old
+                    : near;
+                if (!target)
+                  target =
+                    this.buildings
+                      .filter(
+                        (b) =>
+                          b.owner !== u.owner &&
+                          !b.dead &&
+                          this.distanceTo(u, b) <= u.data.combat.range_tiles + 1,
+                      )
+                      .sort((a, b) => dist(u, a) - dist(u, b))[0] || null;
+                u.target = target && target.id;
+              }
+              if (target) {
+                this.combat(u, target, dt, hits);
+                continue;
+              }
+            }
+            if (o.type === 'advance') {
+              u.phase = 'move';
+              if (this.walk(u, o.point, dt)) u.order = { type: 'idle' };
+            } else u.phase = 'idle';
+          }
+          // Aggregate all contacts before deaths so order never decides lethal trades.
+          const damage = new Map();
+          for (const h of hits) {
+            damage.set(h.target, (damage.get(h.target) || 0) + h.damage);
+            if (this.effects.length < 100)
+              this.effects.push({
+                kind: 'hit',
+                x: h.target.x,
+                y: h.target.y,
+                fromX: h.source.x,
+                fromY: h.source.y,
+                ranged: h.source.data.combat.damage_type === 'pierce',
+                until: this.time + 0.28,
+              });
+          }
+          for (const [t, n] of damage) {
+            t.hp = Math.max(0, t.hp - n);
+            if (t.hp === 0) {
+              if (t.entity === 'unit') {
+                if (t.owner === 0) this.metrics.lost++;
+                else this.metrics.kills++;
+                this.effects.push({
+                  kind: 'death',
+                  x: t.x,
+                  y: t.y,
+                  owner: t.owner,
+                  until: this.time + 5,
+                });
+              } else {
+                t.dead = true;
+                for (const k of this.footprint(t)) this.blocks.delete(k);
+                t.queue = [];
+                this.navRevision++;
+                if (t.type === 'town') this.result = t.owner === 0 ? 'defeat' : 'victory';
+              }
+            }
+          }
+          for (const b of this.buildings)
+            if (!b.dead && b.complete && b.queue.length) {
+              const q = b.queue[0];
+              q.progress += dt;
+              if (q.progress >= STATS[q.type].economy.train_seconds) {
+                const p = this.perimeter(b).find((p) => !this.spatial.near(p.x, p.y, 0.45).length);
+                if (p) {
+                  this.spawn(q.type, b.owner, p.x, p.y);
+                  b.queue.shift();
+                  if (b.owner === 0) {
+                    this.metrics.trained++;
+                    this.emit('trained', `${NAMES[q.type]} đã sẵn sàng`);
+                  }
+                }
+              }
+            }
+          this.effects = this.effects.filter((e) => e.until > this.time);
+          if (this.tick % 200 === 0) {
+            for (const u of this.units) if (u.hp <= 0) this.byId.delete(u.id);
+            this.units = this.units.filter((u) => u.hp > 0);
+          }
+        }
+        ai() {
+          const owner = 1,
+            base = this.buildings.find((b) => b.owner === 0 && b.type === 'town' && !b.dead),
+            army = this.units.filter((u) => u.owner === 1 && u.hp > 0 && u.type !== 'villager');
+          for (const u of this.units)
+            if (u.owner === 1 && u.type === 'villager' && u.hp > 0 && u.order.type === 'idle') {
+              const r = this.nearestResource(u, 'food');
+              if (r) this.order([u], 'gather', r);
+            }
+          const b = this.buildings.find(
+            (b) => b.owner === 1 && b.type === 'barracks' && !b.dead && b.complete,
+          );
+          if (b && b.queue.length < 1 && this.time >= this.nextRecruit) {
+            const roster = this.roster(owner).filter((t) => t !== 'radical_preacher');
+            for (let i = 0; i < roster.length; i++) {
+              const j = (this.aiRoster + i) % roster.length;
+              if (this.recruit(b, roster[j])) {
+                this.aiRoster = j + 1;
+                this.nextRecruit = this.time + 30;
+                break;
+              }
+            }
+          }
+          if (
+            this.population(1) >= this.cap(1) - 1 &&
+            this.canPay(1, BUILD.house.cost) &&
+            !this.buildings.some((b) => b.owner === 1 && !b.complete && !b.dead)
+          ) {
+            outer: for (let y = 10; y < 23; y++)
+              for (let x = 27; x < 39; x++)
+                if (!this.placement('house', x, y, 1)) {
+                  this.pay(1, BUILD.house.cost);
+                  const house = this.building('house', 1, x, y, false),
+                    worker = this.units.find(
+                      (u) => u.owner === 1 && u.type === 'villager' && u.hp > 0,
+                    );
+                  if (worker) this.order([worker], 'build', house);
+                  break outer;
+                }
+          }
+          if (this.time >= this.nextWave && base) {
+            const troops = army.filter((u) => u.order.type !== 'attack');
+            if (troops.length >= 3) {
+              this.order(troops.slice(0, 5), 'attack', base);
+              this.lastWave = this.time;
+              this.emit('wave', 'Trinh sát báo: quân địch đang tiến vào rừng!');
+            }
+            this.nextWave = this.time + 95;
+          }
+        }
+      }
+      // The test runner consumes this pure interface; normal UI never needs cheats.
+      const DEMO_MODEL = { Game, STATS, BUILD, STEP, W, H, BALANCE };
+      /* MODEL_END */
+      /* Presentation and input are adapters over the fixed-step model. */
+      const $ = (id) => document.getElementById(id),
+        canvas = $('world'),
+        ctx = canvas.getContext('2d'),
+        mini = $('minimap'),
+        mc = mini.getContext('2d');
+      let game = new Game(),
+        chosenFaction = 'bundschuh',
+        started = false,
+        paused = false,
+        speed = 1,
+        selection = new Set(),
+        selectedBuilding = null,
+        selectedResource = null,
+        placement = null,
+        attackMove = false,
+        pointer = { x: 0, y: 0 },
+        drag = null,
+        pan = null,
+        keys = new Set(),
+        zoom = 1.3,
+        cam = { x: 9, y: 15 },
+        width = innerWidth,
+        height = innerHeight,
+        accumulator = 0,
+        last = 0,
+        uiClock = 0,
+        toastUntil = 0,
+        renderedResult = false,
+        commandKey = '',
+        hover = null;
+      const TEAM = ['#8fc7cf', '#dd8775'],
+        TERRA = ['#6e7950', '#758054', '#727d51', '#68764b', '#7a8056', '#69744b'];
+      const project = (x, y) => ({ x: (x - y) * 26, y: (x + y) * 13 });
+      function screen(x, y) {
+        const p = project(x, y),
+          c = project(cam.x, cam.y);
+        return { x: (p.x - c.x) * zoom + width / 2, y: (p.y - c.y) * zoom + height * 0.44 };
+      }
+      function world(x, y) {
+        const c = project(cam.x, cam.y),
+          a = (x - width / 2) / zoom + c.x,
+          b = (y - height * 0.44) / zoom + c.y;
+        return { x: a / 52 + b / 26, y: b / 26 - a / 52 };
+      }
+      function polygon(points, fill, stroke) {
+        ctx.beginPath();
+        points.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+      function line(points, color, w = 1) {
+        ctx.beginPath();
+        points.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+        ctx.strokeStyle = color;
+        ctx.lineWidth = w;
+        ctx.stroke();
+      }
+      function ellipse(x, y, rx, ry, fill, stroke) {
+        ctx.beginPath();
+        ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+      function tile(x, y, color, stroke, size = 1) {
+        const p = project(x, y),
+          a = 26 * size,
+          b = 13 * size;
+        polygon(
+          [
+            [p.x, p.y],
+            [p.x + a, p.y + b],
+            [p.x, p.y + 2 * b],
+            [p.x - a, p.y + b],
+          ],
+          color,
+          stroke,
+        );
+      }
+      let ground = null;
+      function makeGround() {
+        ground = document.createElement('canvas');
+        ground.width = (W + H) * 26 + 20;
+        ground.height = (W + H) * 13 + 30;
+        const g = ground.getContext('2d'),
+          rr = rng(game.seed + 49);
+        g.translate(H * 26 + 10, 10);
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++) {
+            const p = project(x, y),
+              road = game.terrain[key(x, y)],
+              col = road
+                ? ['#aa9a70', '#a2946a', '#a79a72'][Math.floor(rr() * 3)]
+                : TERRA[Math.floor(rr() * TERRA.length)];
+            g.fillStyle = col;
+            g.beginPath();
+            g.moveTo(p.x, p.y);
+            g.lineTo(p.x + 26, p.y + 13);
+            g.lineTo(p.x, p.y + 26);
+            g.lineTo(p.x - 26, p.y + 13);
+            g.closePath();
+            g.fill();
+            for (let i = 0; i < (road ? 2 : 5); i++) {
+              const u = rr(),
+                v = rr(),
+                pp = project(x + u, y + v);
+              g.strokeStyle = road ? '#827e5550' : '#344a3250';
+              g.lineWidth = 0.7;
+              g.beginPath();
+              g.moveTo(pp.x, pp.y);
+              g.lineTo(pp.x + (rr() - 0.5) * 5, pp.y - 2 - rr() * 3);
+              g.stroke();
+            }
+          }
+      }
+      function drawTree(e) {
+        const p = project(e.x, e.y),
+          v = e.variant,
+          h = 33 + v * 6;
+        ellipse(p.x + 6, p.y, 16, 6, '#26392842');
+        line(
+          [
+            [p.x, p.y],
+            [p.x, p.y - h + 10],
+          ],
+          '#514735',
+          4,
+        );
+        for (let i = 0; i < 3; i++) {
+          const yy = p.y - h + i * 10,
+            span = 10 + i * 4;
+          polygon(
+            [
+              [p.x, yy - 13],
+              [p.x + span, yy + 14],
+              [p.x - 3, yy + 11],
+              [p.x - span, yy + 14],
+            ],
+            ['#304e3e', '#395b43', '#426344'][i],
+            '#2c463544',
+          );
+          line(
+            [
+              [p.x - 1, yy - 8],
+              [p.x - 5, yy + 8],
+            ],
+            '#63845a77',
+          );
+        }
+        if (e.amount < e.original * 0.4) {
+          line(
+            [
+              [p.x - 7, p.y - 3],
+              [p.x + 6, p.y],
+            ],
+            '#b6a475',
+            2,
+          );
+        }
+      }
+      function drawResource(e) {
+        if (e.type === 'wood') {
+          drawTree(e);
+          return;
+        }
+        const p = project(e.x, e.y);
+        ellipse(p.x, p.y + 1, 18, 8, '#31443040');
+        if (e.type === 'food') {
+          for (let i = 0; i < 5; i++) {
+            const xx = p.x + ((i % 3) - 1) * 10,
+              yy = p.y + Math.floor(i / 3) * 5 - 7;
+            ellipse(xx, yy, 9, 7, '#435e36');
+            ellipse(xx - 2, yy - 2, 6, 4, '#68804b');
+            ellipse(xx - 2, yy, 1.8, 1.5, '#b7614b');
+            ellipse(xx + 3, yy - 3, 1.4, 1.4, '#c77b55');
+          }
+        } else {
+          const gold = e.type === 'gold';
+          polygon(
+            [
+              [p.x - 17, p.y],
+              [p.x - 10, p.y - 13],
+              [p.x + 3, p.y - 18],
+              [p.x + 16, p.y - 5],
+              [p.x + 12, p.y + 5],
+              [p.x - 4, p.y + 9],
+            ],
+            gold ? '#847650' : '#7e8982',
+            '#434f44',
+          );
+          polygon(
+            [
+              [p.x - 10, p.y - 13],
+              [p.x + 3, p.y - 18],
+              [p.x + 6, p.y - 6],
+              [p.x - 3, p.y + 1],
+            ],
+            gold ? '#c4aa59' : '#a0aaa1',
+          );
+          line(
+            [
+              [p.x + 3, p.y - 18],
+              [p.x + 6, p.y - 6],
+              [p.x + 16, p.y - 5],
+            ],
+            gold ? '#e0c66c' : '#c5caba',
+            1.5,
+          );
+        }
+      }
+      function drawBuilding(b) {
+        const p = project(b.gx, b.gy),
+          sz = b.size,
+          a = sz * 26,
+          bb = sz * 13,
+          h = b.type === 'town' ? 45 : b.type === 'barracks' ? 31 : 24,
+          league = game.players[b.owner].faction === 'swabian_league',
+          color = TEAM[b.owner];
+        if (selectedBuilding === b.id) tile(b.gx, b.gy, '#bee4d023', color, sz);
+        ellipse(p.x, p.y + bb, sz * 25, sz * 12, '#27382d45');
+        if (!b.complete) {
+          tile(b.gx, b.gy, '#907f5980', '#cfb97a', sz);
+          for (const [x, y] of [
+            [p.x, p.y],
+            [p.x + a, p.y + bb],
+            [p.x, p.y + bb * 2],
+            [p.x - a, p.y + bb],
+          ])
+            line(
+              [
+                [x, y],
+                [x, y - 22],
+              ],
+              '#c0a276',
+              3,
+            );
+          line(
+            [
+              [p.x - a, p.y + bb - 17],
+              [p.x, p.y + bb * 2 - 17],
+              [p.x + a, p.y + bb - 17],
+            ],
+            '#aa8d5c',
+            2,
+          );
+          line(
+            [
+              [p.x - a + 10, p.y + bb - 5],
+              [p.x + 10, p.y + bb * 2 - 22],
+            ],
+            '#876f48',
+            2,
+          );
+          bar(p.x, p.y - 12, b.hp / b.maxHp, color, 48);
+          return;
+        }
+        // Extruded timber / masonry walls; the silhouette, roof and banner show function.
+        polygon(
+          [
+            [p.x - a, p.y + bb],
+            [p.x, p.y + bb * 2],
+            [p.x, p.y + bb * 2 - h],
+            [p.x - a, p.y + bb - h],
+          ],
+          league ? '#9c9983' : '#c0ab7a',
+          '#564f3a',
+        );
+        polygon(
+          [
+            [p.x, p.y + bb * 2],
+            [p.x + a, p.y + bb],
+            [p.x + a, p.y + bb - h],
+            [p.x, p.y + bb * 2 - h],
+          ],
+          league ? '#787f71' : '#8c855d',
+          '#454d39',
+        );
+        for (let i = 0; i <= sz * 2; i++) {
+          const t = i / (sz * 2);
+          line(
+            [
+              [p.x - a + a * t, p.y + bb + bb * t],
+              [p.x - a + a * t, p.y + bb + bb * t - h],
+            ],
+            league ? '#6a73633d' : '#5b5238',
+            league ? 1 : 2,
+          );
+          line(
+            [
+              [p.x + a * t, p.y + bb * 2 - bb * t],
+              [p.x + a * t, p.y + bb * 2 - bb * t - h],
+            ],
+            league ? '#5a665133' : '#5b5238',
+            league ? 1 : 2,
+          );
+        }
+        line(
+          [
+            [p.x - a, p.y + bb - h / 2],
+            [p.x, p.y + bb * 2 - h / 2],
+            [p.x + a, p.y + bb - h / 2],
+          ],
+          '#595f4980',
+          2,
+        );
+        const rh = b.type === 'camp' ? 10 : b.type === 'town' ? 30 : 21;
+        polygon(
+          [
+            [p.x - a - 4, p.y + bb - h],
+            [p.x, p.y - h - rh],
+            [p.x + a + 4, p.y + bb - h],
+            [p.x, p.y + bb * 2 - h],
+          ],
+          league ? '#675d50' : '#ac9460',
+          '#504b35',
+        );
+        polygon(
+          [
+            [p.x - a - 4, p.y + bb - h],
+            [p.x, p.y - h - rh],
+            [p.x, p.y + bb * 2 - h],
+          ],
+          league ? '#7c6755' : '#c3ab6e',
+        );
+        for (let i = 1; i < 9; i++) {
+          let t = i / 9;
+          line(
+            [
+              [p.x - a * (1 - t), p.y + bb - h - (bb + rh) * t],
+              [p.x, p.y + bb * 2 - h - (bb * 2 + rh) * t],
+            ],
+            league ? '#a08a683c' : '#6e6a3c55',
+          );
+        }
+        const door = { x: p.x + 12, y: p.y + bb * 2 - 7 };
+        polygon(
+          [
+            [door.x, door.y],
+            [door.x + 10, door.y - 5],
+            [door.x + 10, door.y - 24],
+            [door.x, door.y - 19],
+          ],
+          '#354033',
+        );
+        line(
+          [
+            [door.x + 5, door.y - 3],
+            [door.x + 5, door.y - 20],
+          ],
+          '#6e7151',
+        );
+        for (const t of [0.25, 0.7]) {
+          const xx = p.x - a + a * t,
+            yy = p.y + bb + bb * t - h * 0.7;
+          polygon(
+            [
+              [xx, yy],
+              [xx + 7, yy + 3],
+              [xx + 7, yy + 11],
+              [xx, yy + 8],
+            ],
+            '#3e4e3d',
+            '#d4c698',
+          );
+        }
+        if (b.type === 'town') {
+          line(
+            [
+              [p.x, p.y - h - rh + 5],
+              [p.x, p.y - h - rh - 27],
+            ],
+            '#e1cc9a',
+            2,
+          );
+          polygon(
+            [
+              [p.x + 1, p.y - h - rh - 27],
+              [p.x + 25, p.y - h - rh - 22],
+              [p.x + 18, p.y - h - rh - 14],
+              [p.x + 1, p.y - h - rh - 17],
+            ],
+            color,
+            '#314b43',
+          );
+          line(
+            [
+              [p.x + 8, p.y - h - rh - 24],
+              [p.x + 8, p.y - h - rh - 16],
+            ],
+            '#edf0d3',
+            2,
+          );
+        } else if (b.type === 'barracks') {
+          const xx = p.x + 17,
+            yy = p.y + bb - h / 2;
+          line(
+            [
+              [xx, yy + 18],
+              [xx + 10, yy - 11],
+            ],
+            '#dacb9f',
+            2,
+          );
+          line(
+            [
+              [xx + 12, yy + 14],
+              [xx - 2, yy - 9],
+            ],
+            '#d6dfce',
+            2,
+          );
+        } else if (b.type === 'camp') {
+          for (let i = 0; i < 4; i++)
+            line(
+              [
+                [p.x - a - 9 + i * 3, p.y + bb + 5 + i],
+                [p.x - a + 12 + i * 3, p.y + bb + 15 + i],
+              ],
+              '#b09a65',
+              4,
+            );
+        } else {
+          line(
+            [
+              [p.x - 5, p.y - h - rh],
+              [p.x - 5, p.y - h - rh - 11],
+            ],
+            '#807b65',
+            7,
+          );
+        }
+        if (b.hp < b.maxHp || selectedBuilding === b.id)
+          bar(p.x, p.y - h - rh - 10, b.hp / b.maxHp, color, 55);
+        if (b.queue.length) {
+          const q = b.queue[0];
+          bar(
+            p.x,
+            p.y + bb * 2 + 8,
+            q.progress / STATS[q.type].economy.train_seconds,
+            '#e0ba66',
+            40,
+          );
+        }
+      }
+      function bar(x, y, p, color, w = 26) {
+        ctx.fillStyle = '#22332bea';
+        ctx.fillRect(x - w / 2 - 1, y - 1, w + 2, 5);
+        ctx.fillStyle = color;
+        ctx.fillRect(x - w / 2, y, w * clamp(p, 0, 1), 3);
+      }
+      function drawUnit(u) {
+        const p = project(u.x, u.y),
+          chosen = selection.has(u.id),
+          mounted = u.type === 'heavy_gendarme',
+          preacher = u.type === 'radical_preacher',
+          league = game.players[u.owner].faction === 'swabian_league';
+        const cloth = u.owner === 0 ? '#79aeb5' : '#b16050',
+          bob = u.moving ? Math.sin(game.time * 13 * u.buff + u.id) * 1.3 : 0,
+          swing = game.time - u.attackTime < 0.22;
+        if (preacher && chosen) {
+          ctx.save();
+          ctx.globalAlpha = 0.12;
+          ellipse(p.x, p.y, 6 * 36.77, 6 * 18.38, '#e4cd73', '#ffe2a0');
+          ctx.restore();
+        }
+        ellipse(p.x, p.y + 1, mounted ? 13 : 8, mounted ? 5 : 3, '#22342765');
+        if (chosen) ellipse(p.x, p.y, mounted ? 15 : 10, mounted ? 7 : 5, null, '#b9ecda');
+        if (mounted) {
+          ellipse(p.x, p.y - 9, 13, 7, '#5e5946');
+          polygon(
+            [
+              [p.x + 5, p.y - 11],
+              [p.x + 9, p.y - 24],
+              [p.x + 17, p.y - 21],
+              [p.x + 18, p.y - 14],
+              [p.x + 12, p.y - 15],
+              [p.x + 13, p.y - 6],
+            ],
+            '#71654d',
+            '#3b4539',
+          );
+          polygon(
+            [
+              [p.x - 11, p.y - 11],
+              [p.x + 5, p.y - 16],
+              [p.x + 9, p.y - 5],
+              [p.x - 10, p.y - 3],
+            ],
+            '#a2aaa0',
+            '#525f53',
+          );
+          line(
+            [
+              [p.x - 9, p.y - 6],
+              [p.x - 11 + bob, p.y + 1],
+            ],
+            '#4a4b39',
+            3,
+          );
+          line(
+            [
+              [p.x + 8, p.y - 5],
+              [p.x + 9 - bob, p.y + 2],
+            ],
+            '#4a4b39',
+            3,
+          );
+        }
+        const yy = p.y - (mounted ? 13 : 0) + bob;
+        line(
+          [
+            [p.x - 2, yy - 7],
+            [p.x - 3 - bob, yy - 1],
+          ],
+          '#393c31',
+          2.5,
+        );
+        line(
+          [
+            [p.x + 2, yy - 7],
+            [p.x + 3 + bob, yy],
+          ],
+          '#393c31',
+          2.5,
+        );
+        polygon(
+          [
+            [p.x - 4, yy - 17],
+            [p.x + 4, yy - 17],
+            [p.x + 6, yy - 6],
+            [p.x - 5, yy - 6],
+          ],
+          preacher ? '#4b4a37' : cloth,
+          '#364136',
+        );
+        if (league && u.type !== 'villager')
+          polygon(
+            [
+              [p.x - 4, yy - 17],
+              [p.x + 4, yy - 17],
+              [p.x + 3, yy - 9],
+              [p.x - 2, yy - 10],
+            ],
+            '#b0b7a3',
+          );
+        ellipse(p.x, yy - 21, 3.7, 4, '#d2bb8c');
+        if (league && u.type !== 'villager') {
+          ellipse(p.x, yy - 23, 4.6, 2.5, '#a4b4aa');
+          line(
+            [
+              [p.x + 2, yy - 24],
+              [p.x + 4, yy - 29],
+            ],
+            cloth,
+            2,
+          );
+        } else if (preacher) {
+          ellipse(p.x, yy - 23, 4, 3, '#635942');
+        } else {
+          ellipse(p.x, yy - 24, 4.5, 2, '#bbaa76');
+        }
+        const wx = p.x + 5,
+          wy = yy - 13;
+        if (u.type.includes('pikeman')) {
+          line(
+            [
+              [wx - 3, wy + 10],
+              [wx + 7 + (swing ? 12 : 0), wy - 31 + (swing ? 17 : 0)],
+            ],
+            '#c5b786',
+            1.6,
+          );
+          const xx = wx + 7 + (swing ? 12 : 0),
+            yyy = wy - 31 + (swing ? 17 : 0);
+          polygon(
+            [
+              [xx, yyy - 5],
+              [xx - 2, yyy + 3],
+              [xx + 3, yyy + 1],
+            ],
+            '#c7d6c6',
+          );
+        } else if (u.type === 'peasant_flailman') {
+          line(
+            [
+              [wx - 1, wy + 5],
+              [wx + 8, wy - 11 + (swing ? 12 : 0)],
+            ],
+            '#c6b37e',
+            2,
+          );
+          line(
+            [
+              [wx + 8, wy - 11 + (swing ? 12 : 0)],
+              [wx + 14, wy - 5 + (swing ? 12 : 0)],
+            ],
+            '#343d31',
+          );
+          line(
+            [
+              [wx + 14, wy - 5 + (swing ? 12 : 0)],
+              [wx + 17, wy + 3 + (swing ? 12 : 0)],
+            ],
+            '#b2a273',
+            3,
+          );
+        } else if (preacher) {
+          polygon(
+            [
+              [wx - 1, wy - 4],
+              [wx + 7, wy - 2],
+              [wx + 6, wy + 4],
+              [wx - 2, wy + 2],
+            ],
+            '#e7d8ad',
+            '#a39265',
+          );
+        } else if (u.type === 'crossbowman') {
+          line(
+            [
+              [wx - 2, wy + 3],
+              [wx + 9, wy - 5],
+            ],
+            '#bfad77',
+            2,
+          );
+          line(
+            [
+              [wx + 1, wy - 6],
+              [wx + 10, wy + 3],
+            ],
+            '#d0c392',
+            1.5,
+          );
+        } else if (mounted) {
+          line(
+            [
+              [wx, wy + 5],
+              [wx + 15, wy - 11 + (swing ? 20 : 0)],
+            ],
+            '#d0d8c7',
+            2,
+          );
+        } else if (u.phase === 'gather' || u.phase === 'build') {
+          line(
+            [
+              [wx, wy],
+              [wx + 9, wy - 9 + Math.sin(game.time * 10) * 4],
+            ],
+            '#c9b688',
+            2,
+          );
+          line(
+            [
+              [wx + 5, wy - 10 + Math.sin(game.time * 10) * 4],
+              [wx + 12, wy - 7 + Math.sin(game.time * 10) * 4],
+            ],
+            '#b3b9a2',
+            3,
+          );
+        }
+        if (u.cargo.amount) {
+          ellipse(
+            p.x - 6,
+            yy - 12,
+            4,
+            5,
+            u.cargo.type === 'gold' ? '#cbb15b' : u.cargo.type === 'food' ? '#c6a17a' : '#95815a',
+          );
+        }
+        if (chosen || u.hp < u.maxHp)
+          bar(p.x, yy - (u.type.includes('pikeman') ? 35 : 32), u.hp / u.maxHp, TEAM[u.owner], 25);
+        if (u.buff > 1) {
+          ctx.fillStyle = '#e2c979';
+          ctx.fillRect(p.x - 1, yy - 39, 3, 3);
+        }
+      }
+      function render() {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = '#263b30';
+        ctx.fillRect(0, 0, width, height);
+        const cp = project(cam.x, cam.y);
+        ctx.save();
+        ctx.translate(width / 2 - cp.x * zoom, height * 0.44 - cp.y * zoom);
+        ctx.scale(zoom, zoom);
+        ctx.drawImage(ground, -H * 26 - 10, -10);
+        // Waymarks on the three clear roads, always behind physical entities.
+        ctx.font = 'italic 12px Georgia';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#4c573a';
+        for (const [y, label] of [
+          [8, 'ĐƯỜNG THÔNG BẮC'],
+          [15, 'HÀNH LANG RỪNG ĐEN'],
+          [23, 'ĐƯỜNG MÒN PHÍA NAM'],
+        ]) {
+          const p = project(20, y);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(Math.atan(0.5));
+          ctx.fillText(label, 0, 3);
+          ctx.restore();
+        }
+        for (const e of game.effects)
+          if (e.kind === 'death') {
+            const p = project(e.x, e.y);
+            ctx.globalAlpha = Math.min(1, (e.until - game.time) / 2);
+            line(
+              [
+                [p.x - 5, p.y - 3],
+                [p.x + 5, p.y + 3],
+              ],
+              '#50563e',
+              5,
+            );
+            line(
+              [
+                [p.x - 4, p.y + 3],
+                [p.x + 4, p.y - 3],
+              ],
+              '#8b7451',
+              2,
+            );
+            ctx.globalAlpha = 1;
+          }
+        const objects = [
+          ...game.resources.filter((r) => r.amount > 0),
+          ...game.buildings.filter((b) => !b.dead),
+          ...game.units.filter((u) => u.hp > 0),
+        ];
+        objects.sort((a, b) => a.x + a.y - (b.x + b.y));
+        for (const e of objects) {
+          const s = screen(e.x, e.y);
+          if (s.x < -130 || s.x > width + 130 || s.y < -30 || s.y > height + 120) continue;
+          if (e.entity === 'resource') {
+            if (selectedResource === e.id) tile(e.gx, e.gy, '#e5d28055', '#e5d280');
+            drawResource(e);
+          } else if (e.entity === 'building') drawBuilding(e);
+          else drawUnit(e);
+        }
+        if (placement) {
+          const p = world(pointer.x, pointer.y),
+            x = Math.floor(p.x),
+            y = Math.floor(p.y),
+            reason = game.placement(placement, x, y, 0);
+          tile(
+            x,
+            y,
+            reason ? '#d6695470' : '#a7d49170',
+            reason ? '#ff9f89' : '#d1edac',
+            BUILD[placement].size,
+          );
+          const q = project(x, y);
+          ctx.fillStyle = '#1c2d24f0';
+          ctx.fillRect(q.x - 95, q.y - 32, 190, 23);
+          ctx.font = '11px system-ui';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = reason ? '#ffb19b' : '#d7ebbe';
+          ctx.fillText(reason || 'Click để đặt · Esc hủy', q.x, q.y - 16);
+        }
+        for (const e of game.effects)
+          if (e.kind === 'hit') {
+            const p = project(e.x, e.y);
+            ctx.globalAlpha = clamp((e.until - game.time) / 0.28, 0, 1);
+            if (e.ranged) {
+              const f = project(e.fromX, e.fromY);
+              line(
+                [
+                  [f.x, f.y - 16],
+                  [p.x, p.y - 12],
+                ],
+                '#e5d7a0',
+                1,
+              );
+            } else {
+              line(
+                [
+                  [p.x - 5, p.y - 19],
+                  [p.x + 6, p.y - 8],
+                ],
+                '#f0d7a0',
+                2,
+              );
+              line(
+                [
+                  [p.x + 5, p.y - 20],
+                  [p.x - 4, p.y - 9],
+                ],
+                '#f0d7a0',
+                1,
+              );
+            }
+            ctx.globalAlpha = 1;
+          }
+        if (marker && marker.until > performance.now()) {
+          const p = project(marker.x, marker.y);
+          ellipse(p.x, p.y, 12, 6, null, marker.attack ? '#e69a7b' : '#e2dab0');
+          line(
+            [
+              [p.x - 6, p.y],
+              [p.x + 6, p.y],
+            ],
+            marker.attack ? '#e69a7b' : '#e2dab0',
+          );
+        }
+        ctx.restore();
+        if (drag && Math.hypot(pointer.x - drag.x, pointer.y - drag.y) > 5) {
+          ctx.fillStyle = '#ccebd019';
+          ctx.strokeStyle = '#cfead0';
+          ctx.lineWidth = 1;
+          ctx.fillRect(drag.x, drag.y, pointer.x - drag.x, pointer.y - drag.y);
+          ctx.strokeRect(drag.x, drag.y, pointer.x - drag.x, pointer.y - drag.y);
+        }
+        // Subtle edge shade keeps the map legible beneath the chronicle frame.
+        const shade = ctx.createLinearGradient(0, height - 220, 0, height);
+        shade.addColorStop(0, '#10221b00');
+        shade.addColorStop(1, '#10221baa');
+        ctx.fillStyle = shade;
+        ctx.fillRect(0, height - 220, width, 220);
+      }
+      function minimap() {
+        mc.fillStyle = '#6e7950';
+        mc.fillRect(0, 0, 380, 210);
+        const sx = 380 / W,
+          sy = 210 / H;
+        for (const r of game.resources)
+          if (r.amount > 0) {
+            mc.fillStyle =
+              r.type === 'wood'
+                ? '#314f3c'
+                : r.type === 'gold'
+                  ? '#e2c673'
+                  : r.type === 'food'
+                    ? '#cbb28b'
+                    : '#bcc0ae';
+            mc.fillRect(r.gx * sx, r.gy * sy, Math.ceil(sx), Math.ceil(sy));
+          }
+        for (const b of game.buildings)
+          if (!b.dead) {
+            mc.fillStyle = TEAM[b.owner];
+            mc.fillRect(b.gx * sx, b.gy * sy, b.size * sx, b.size * sy);
+          }
+        for (const u of game.units)
+          if (u.hp > 0) {
+            mc.fillStyle = TEAM[u.owner];
+            mc.fillRect(u.x * sx - 1.8, u.y * sy - 1.8, 3.6, 3.6);
+          }
+        mc.strokeStyle = '#f0ebbf';
+        mc.lineWidth = 1.5;
+        mc.beginPath();
+        [
+          [0, 66],
+          [width, 66],
+          [width, height - 180],
+          [0, height - 180],
+        ].forEach(([x, y], i) => {
+          const p = world(x, y);
+          i ? mc.lineTo(p.x * sx, p.y * sy) : mc.moveTo(p.x * sx, p.y * sy);
+        });
+        mc.closePath();
+        mc.stroke();
+      }
+      function selectedUnits() {
+        return game.units.filter((u) => u.hp > 0 && u.owner === 0 && selection.has(u.id));
+      }
+      function costText(cost) {
+        return RES.filter((r) => cost[r])
+          .map((r) => `${cost[r]}${{ food: 'F', wood: 'W', gold: 'G', stone: 'S' }[r]}`)
+          .join(' · ');
+      }
+      function toast(text) {
+        $('toast').textContent = text;
+        $('toast').classList.add('show');
+        toastUntil = performance.now() + 3300;
+      }
+      function setSelection(list, b = null, r = null) {
+        selection = new Set(list.map((u) => u.id));
+        selectedBuilding = b ? b.id : null;
+        selectedResource = r ? r.id : null;
+        commandKey = '';
+        updateUI();
+      }
+      function updateUI() {
+        if (!started) return;
+        for (const r of RES) $('r-' + r).textContent = game.players[0].bank[r];
+        $('r-pop').textContent = `${game.population(0)}/${game.cap(0)}`;
+        $('clock').textContent =
+          `${String(Math.floor(game.time / 60)).padStart(2, '0')}:${String(Math.floor(game.time % 60)).padStart(2, '0')}`;
+        $('speed').textContent = speed + '×';
+        $('pause').textContent = paused ? '▶' : 'Ⅱ';
+        $('paused').hidden = !paused || !$('help-modal').hidden;
+        $('faction-label').textContent = FACTIONS[game.players[0].faction];
+        $('enemy-name').textContent = FACTIONS[game.players[1].faction].toUpperCase();
+        $('enemy-status').textContent = game.lastWave
+          ? `Đợt tiến công lúc ${Math.floor(game.lastWave / 60)}:${String(Math.floor(game.lastWave % 60)).padStart(2, '0')}`
+          : `Trinh sát: đợt tiến công đầu ở 2:30`;
+        const units = selectedUnits(),
+          b = game.byId.get(selectedBuilding),
+          r = game.byId.get(selectedResource);
+        if (b && b.dead) selectedBuilding = null;
+        if (r && r.amount === 0) selectedResource = null;
+        let name = 'Chọn một đơn vị',
+          symbol = '⚑',
+          desc = 'Click quân hoặc công trình để ra lệnh.',
+          stat = 'Màu xanh: bạn · Đỏ: đối phương',
+          hp = 1;
+        if (units.length) {
+          const u = units[0];
+          name = units.length === 1 ? NAMES[u.type] : `${units.length} đơn vị`;
+          symbol = GLYPHS[u.type];
+          const workers = units.filter((u) => u.type === 'villager').length;
+          desc =
+            units.length === 1
+              ? {
+                  idle: 'Đang chờ lệnh',
+                  gather: 'Đang khai thác',
+                  resource: 'Tới tài nguyên',
+                  return: 'Đang giao hàng',
+                  build: 'Đang xây dựng',
+                  move: 'Đang hành quân',
+                  attack: 'Đang giao chiến',
+                }[u.phase] || 'Đang chờ lệnh'
+              : `${workers} dân làng · ${units.length - workers} binh sĩ`;
+          hp = units.reduce((s, u) => s + u.hp, 0) / units.reduce((s, u) => s + u.maxHp, 0);
+          stat =
+            units.length === 1
+              ? `${Math.ceil(u.hp)}/${u.maxHp} HP · ATK ${u.data.combat.attack} · Giáp ${u.data.combat.armor.melee}/${u.data.combat.armor.pierce}${u.buff > 1 ? ' · Hào khí +15%' : ''}${u.cargo.amount ? ` · Mang ${u.cargo.amount} ${u.cargo.type}` : ''}`
+              : 'Click phải mục tiêu để ra lệnh';
+        } else if (b && !b.dead) {
+          name = BUILD[b.type].name;
+          symbol = GLYPHS[b.type];
+          desc =
+            b.owner === 0
+              ? b.complete
+                ? 'Công trình của bạn'
+                : 'Đang xây · cần dân làng'
+              : 'Công trình đối phương';
+          hp = b.hp / b.maxHp;
+          stat = `${Math.ceil(b.hp)}/${b.maxHp} HP${!b.complete ? ` · ${Math.floor((b.work / BUILD[b.type].work) * 100)}%` : ''}`;
+        } else if (r && r.amount) {
+          name = { food: 'Bụi quả', wood: 'Cây rừng', gold: 'Mỏ vàng', stone: 'Mỏ đá' }[r.type];
+          symbol = { food: '♧', wood: '♜', gold: '◆', stone: '⬟' }[r.type];
+          desc = 'Chọn dân → click phải để khai thác';
+          stat = `Còn ${r.amount} ${r.type}`;
+          hp = r.amount / r.original;
+        }
+        $('selection').innerHTML =
+          `<div class="portrait">${symbol}</div><div><h3>${name}</h3><p>${desc}</p><div class="health"><i style="width:${hp * 100}%"></i></div><p class="stat">${stat}</p></div>`;
+        const mode = units.some((u) => u.type === 'villager')
+          ? 'workers'
+          : units.length
+            ? 'army'
+            : b && b.owner === 0 && b.complete && !b.dead
+              ? b.type
+              : 'none';
+        const signature = `${mode}:${selectedBuilding}:${game.players[0].faction}`;
+        if (signature !== commandKey) {
+          commandKey = signature;
+          const actions = $('actions');
+          actions.replaceChildren();
+          const add = (label, small, glyph, fn, testid) => {
+            const btn = document.createElement('button');
+            btn.className = 'cmd';
+            btn.dataset.action = testid;
+            btn.innerHTML = `<span class="glyph">${glyph}</span><b>${label}</b><small>${small}</small>`;
+            btn.onclick = fn;
+            actions.append(btn);
+          };
+          if (mode === 'workers') {
+            for (const type of ['house', 'barracks', 'camp'])
+              add(
+                BUILD[type].name,
+                costText(BUILD[type].cost),
+                GLYPHS[type],
+                () => startPlacement(type),
+                'build-' + type,
+              );
+          } else if (mode === 'town' || mode === 'barracks') {
+            for (const type of mode === 'town' ? ['villager'] : game.roster(0))
+              add(
+                NAMES[type],
+                costText(STATS[type].economy.cost),
+                GLYPHS[type],
+                () => {
+                  if (game.recruit(b, type)) {
+                    tone('order');
+                    commandKey = '';
+                    updateUI();
+                  } else toast('Không đủ tài nguyên, hết chỗ dân số hoặc hàng chờ đã đầy.');
+                },
+                'train-' + type,
+              );
+          } else if (mode === 'army') {
+            add(
+              'Tiến công',
+              'Click đất để vừa đi vừa đánh',
+              '⚔',
+              () => {
+                attackMove = true;
+                placement = null;
+                toast('Click trái vào điểm tiến công.');
+              },
+              'advance',
+            );
+            add(
+              'Giữ vị trí',
+              'Không tự đuổi theo địch',
+              '◇',
+              () => {
+                game.order(selectedUnits(), 'hold');
+                tone('order');
+              },
+              'hold',
+            );
+          } else {
+            add(
+              'Chọn dân',
+              'Bắt đầu nền kinh tế',
+              '♟',
+              () =>
+                setSelection(
+                  game.units.filter((u) => u.owner === 0 && u.type === 'villager' && u.hp > 0),
+                ),
+              'select-workers',
+            );
+            add('Về làng', 'Sở chỉ huy · Tuyển dân', '⌂', goHome, 'home');
+          }
+        }
+        const q = $('queue');
+        q.replaceChildren();
+        if (b && b.owner === 0 && !b.dead && b.queue.length) {
+          b.queue.forEach((item, i) => {
+            const btn = document.createElement('button');
+            btn.style.cssText =
+              'font-size:10px;padding:1px 6px;margin-right:4px;background:transparent';
+            btn.title = 'Click để hủy và hoàn toàn bộ chi phí';
+            btn.textContent = `${NAMES[item.type]} ${i === 0 ? Math.min(100, Math.floor((item.progress / STATS[item.type].economy.train_seconds) * 100)) + '%' : '…'} ×`;
+            btn.onclick = () => {
+              game.cancelRecruit(b, i);
+              updateUI();
+            };
+            q.append(btn);
+          });
+        } else
+          q.textContent =
+            mode === 'workers'
+              ? 'Kho nhận cả bốn tài nguyên · Nhà +5 dân số'
+              : mode === 'army'
+                ? 'Giáo > kỵ binh · Flailman > giáo · Preacher tăng tốc'
+                : mode === 'barracks' || mode === 'town'
+                  ? 'Chi phí: F lương thực · W gỗ · G vàng'
+                  : 'Click bản đồ nhỏ để quan sát đối phương';
+        $('cmd-title').textContent =
+          mode === 'workers'
+            ? 'Xây dựng'
+            : mode === 'town' || mode === 'barracks'
+              ? 'Tuyển quân'
+              : 'Mệnh lệnh';
+        $('objective').textContent =
+          game.metrics.gathered < 10
+            ? '① Chọn dân → click phải vào lương thực.'
+            : game.metrics.built < 1
+              ? '② Chọn dân → H → đặt một nhà dân.'
+              : game.metrics.trained < 3
+                ? '③ Chọn trại lính → tuyển thêm binh sĩ.'
+                : '④ Tập hợp quân, vượt rừng và phá sở chỉ huy địch.';
+        $('hint').textContent = placement
+          ? 'Đặt công trình: click trái · Hủy: Esc / click phải'
+          : attackMove
+            ? 'Chọn điểm tiến công bằng click trái · Esc hủy'
+            : 'Kéo chọn quân · Click phải ra lệnh · WASD camera · Space tạm dừng';
+        minimap();
+      }
+      function goHome() {
+        const b = game.buildings.find((b) => b.owner === 0 && b.type === 'town' && !b.dead);
+        if (b) {
+          cam = { x: b.x + 1, y: b.y };
+          setSelection([], b);
+        }
+      }
+      function startPlacement(type) {
+        if (!selectedUnits().some((u) => u.type === 'villager')) {
+          toast('Chọn ít nhất một dân làng trước.');
+          return;
+        }
+        placement = type;
+        attackMove = false;
+        updateUI();
+      }
+      function hitAt(x, y) {
+        const p = world(x, y);
+        let best = null,
+          score = Infinity;
+        for (const u of game.units)
+          if (u.hp > 0) {
+            const s = screen(u.x, u.y),
+              d = Math.hypot(s.x - x, (s.y - 12 * zoom - y) * 1.15);
+            if (d < 19 * zoom && d < score) {
+              score = d;
+              best = u;
+            }
+          }
+        if (best) return best;
+        const cell = game.blocks.get(key(Math.floor(p.x), Math.floor(p.y)));
+        if (cell) return cell;
+        for (const b of game.buildings
+          .filter((b) => !b.dead)
+          .sort((a, b) => b.x + b.y - a.x - a.y)) {
+          const s = screen(b.x, b.y);
+          if (
+            Math.abs(s.x - x) < b.size * 19 * zoom &&
+            y < s.y &&
+            y > s.y - (b.type === 'town' ? 85 : 58) * zoom
+          )
+            return b;
+        }
+        return null;
+      }
+      let marker = null;
+      function commandAt(x, y, advance = false) {
+        const list = selectedUnits();
+        if (!list.length) {
+          toast('Chọn quân hoặc dân trước khi ra lệnh.');
+          return;
+        }
+        const p = world(x, y),
+          t = hitAt(x, y);
+        if (t && t.entity === 'resource') {
+          const workers = list.filter((u) => u.type === 'villager');
+          if (workers.length) game.order(workers, 'gather', t);
+          else game.order(list, advance ? 'advance' : 'move', p);
+        } else if (t && t.owner === 1 && t.entity !== 'resource') {
+          const fighters = list.filter((u) => u.data.combat.attack > 0);
+          game.order(fighters, 'attack', t);
+          const support = list.filter((u) => u.data.combat.attack === 0);
+          game.order(support, 'move', p);
+        } else if (t && t.entity === 'building' && !t.complete) {
+          game.order(
+            list.filter((u) => u.type === 'villager'),
+            'build',
+            t,
+          );
+        } else game.order(list, advance ? 'advance' : 'move', p);
+        marker = { ...p, until: performance.now() + 800, attack: advance || (t && t.owner === 1) };
+        tone('order');
+        updateUI();
+      }
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!started || renderedResult || !$('help-modal').hidden) return;
+        pointer = { x: e.clientX, y: e.clientY };
+        canvas.setPointerCapture(e.pointerId);
+        if (e.button === 1) {
+          pan = { x: e.clientX, y: e.clientY, cam: { ...cam } };
+          e.preventDefault();
+          return;
+        }
+        if (e.button === 2) {
+          if (placement || attackMove) {
+            placement = null;
+            attackMove = false;
+            updateUI();
+          } else commandAt(e.clientX, e.clientY);
+          return;
+        }
+        if (e.button !== 0) return;
+        if (placement) {
+          const p = world(e.clientX, e.clientY),
+            x = Math.floor(p.x),
+            y = Math.floor(p.y),
+            reason = game.placement(placement, x, y, 0);
+          if (reason) {
+            toast(reason);
+            return;
+          }
+          const b = game.place(placement, x, y, selectedUnits());
+          if (b) {
+            placement = null;
+            tone('build');
+            updateUI();
+          } else toast('Dân không thể tới nền xây.');
+          return;
+        }
+        if (attackMove) {
+          commandAt(e.clientX, e.clientY, true);
+          attackMove = false;
+          return;
+        }
+        drag = { x: e.clientX, y: e.clientY, shift: e.shiftKey };
+      });
+      canvas.addEventListener('pointermove', (e) => {
+        pointer = { x: e.clientX, y: e.clientY };
+        if (pan) {
+          const a = world(pan.x, pan.y),
+            b = world(e.clientX, e.clientY);
+          cam.x = clamp(pan.cam.x + a.x - b.x, 0, W);
+          cam.y = clamp(pan.cam.y + a.y - b.y, 0, H);
+        }
+        hover = hitAt(e.clientX, e.clientY);
+        canvas.style.cursor = placement || attackMove ? 'crosshair' : hover ? 'pointer' : 'default';
+      });
+      canvas.addEventListener('pointerup', (e) => {
+        if (e.button === 1) {
+          pan = null;
+          return;
+        }
+        if (e.button !== 0 || !drag) return;
+        const d = drag;
+        drag = null;
+        const moved = Math.hypot(e.clientX - d.x, e.clientY - d.y) > 7;
+        let picked = [];
+        if (moved) {
+          const x1 = Math.min(d.x, e.clientX),
+            x2 = Math.max(d.x, e.clientX),
+            y1 = Math.min(d.y, e.clientY),
+            y2 = Math.max(d.y, e.clientY);
+          picked = game.units.filter((u) => {
+            const s = screen(u.x, u.y);
+            return u.hp > 0 && u.owner === 0 && s.x >= x1 && s.x <= x2 && s.y >= y1 && s.y <= y2;
+          });
+        } else {
+          const t = hitAt(e.clientX, e.clientY);
+          if (t && t.entity === 'unit' && t.owner === 0) picked = [t];
+          else {
+            setSelection(
+              d.shift ? selectedUnits() : [],
+              t && t.entity === 'building' ? t : null,
+              t && t.entity === 'resource' ? t : null,
+            );
+            return;
+          }
+        }
+        if (d.shift) {
+          const ids = new Set(selection);
+          for (const u of picked) {
+            if (!moved && ids.has(u.id)) ids.delete(u.id);
+            else ids.add(u.id);
+          }
+          picked = game.units.filter((u) => ids.has(u.id));
+        }
+        setSelection(picked);
+        if (picked.length) tone('select');
+      });
+      canvas.addEventListener('pointercancel', () => {
+        drag = null;
+        pan = null;
+      });
+      canvas.addEventListener(
+        'wheel',
+        (e) => {
+          e.preventDefault();
+          if (!started) return;
+          const before = world(e.clientX, e.clientY);
+          zoom = clamp(zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12), 0.65, 2.3);
+          const after = world(e.clientX, e.clientY);
+          cam.x = clamp(cam.x + before.x - after.x, 0, W);
+          cam.y = clamp(cam.y + before.y - after.y, 0, H);
+        },
+        { passive: false },
+      );
+      mini.addEventListener('pointerdown', (e) => {
+        const r = mini.getBoundingClientRect();
+        cam.x = clamp(((e.clientX - r.left) / r.width) * W, 0, W);
+        cam.y = clamp(((e.clientY - r.top) / r.height) * H, 0, H);
+      });
+      function showHelp() {
+        if (!started || renderedResult) return;
+        helpWasPaused = paused;
+        paused = true;
+        keys.clear();
+        $('help-modal').hidden = false;
+        updateUI();
+      }
+      let helpWasPaused = false;
+      function closeHelp() {
+        paused = helpWasPaused;
+        $('help-modal').hidden = true;
+        updateUI();
+      }
+      function togglePause() {
+        if (!started || renderedResult || !$('help-modal').hidden) return;
+        paused = !paused;
+        accumulator = 0;
+        updateUI();
+      }
+      function army() {
+        const list = game.units.filter((u) => u.owner === 0 && u.hp > 0 && u.type !== 'villager');
+        setSelection(list);
+      }
+      function idleWorkers() {
+        let list = game.units.filter(
+          (u) => u.owner === 0 && u.hp > 0 && u.type === 'villager' && u.order.type === 'idle',
+        );
+        if (!list.length) {
+          toast('Không có dân rảnh. Chọn dân đang làm việc trực tiếp trên bản đồ.');
+          return;
+        }
+        setSelection(list);
+        cam = { x: list[0].x, y: list[0].y };
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.target instanceof HTMLInputElement) return;
+        const k = e.key.toLowerCase();
+        if ([' ', 'tab', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'home'].includes(k))
+          e.preventDefault();
+        if (k === 'escape') {
+          if (!$('help-modal').hidden) closeHelp();
+          else if (placement || attackMove) {
+            placement = null;
+            attackMove = false;
+            updateUI();
+          }
+          return;
+        }
+        if (!started || renderedResult || !$('help-modal').hidden) return;
+        keys.add(k);
+        if (e.repeat) return;
+        if (k === ' ') togglePause();
+        if (k === 'h') startPlacement('house');
+        if (k === 'b') startPlacement('barracks');
+        if (k === 'c') startPlacement('camp');
+        if (k === 'tab') army();
+        if (k === 'v') idleWorkers();
+        if (k === 'home') goHome();
+        if (k === 'x') {
+          game.order(selectedUnits(), 'idle');
+          updateUI();
+        }
+        if (k === '?') showHelp();
+      });
+      document.addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+      window.addEventListener('blur', () => {
+        keys.clear();
+        drag = null;
+        pan = null;
+        if (started && !renderedResult) {
+          paused = true;
+          accumulator = 0;
+          updateUI();
+        }
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && started) {
+          paused = true;
+          accumulator = 0;
+          updateUI();
+        }
+      });
+      $('pause').onclick = togglePause;
+      $('speed').onclick = () => {
+        speed = speed === 1 ? 2 : 1;
+        updateUI();
+      };
+      $('help').onclick = showHelp;
+      $('resume').onclick = closeHelp;
+      $('select-army').onclick = army;
+      $('select-idle').onclick = idleWorkers;
+      $('home').onclick = goHome;
+      $('stop').onclick = () => {
+        game.order(selectedUnits(), 'idle');
+        updateUI();
+      };
+      document.querySelectorAll('[data-faction]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            chosenFaction = b.dataset.faction;
+            document.querySelectorAll('[data-faction]').forEach((x) => {
+              const active = x === b;
+              x.classList.toggle('active', active);
+              x.setAttribute('aria-pressed', String(active));
+            });
+          }),
+      );
+      function startGame() {
+        const raw = Number($('seed').value);
+        const seed = Number.isInteger(raw) && raw >= 0 && raw <= 999999 ? raw : 1524;
+        $('seed').value = seed;
+        game = new Game(chosenFaction, seed);
+        started = true;
+        paused = false;
+        speed = 1;
+        selection = new Set();
+        selectedBuilding = null;
+        selectedResource = null;
+        placement = null;
+        attackMove = false;
+        renderedResult = false;
+        accumulator = 0;
+        keys.clear();
+        commandKey = '';
+        cam = { x: 10, y: 15 };
+        zoom = width < 1100 ? 1.1 : 1.35;
+        makeGround();
+        $('start').hidden = true;
+        $('result').hidden = true;
+        $('help-modal').hidden = true;
+        $('game-ui').hidden = false;
+        $('map-seed').textContent = seed;
+        setSelection(game.units.filter((u) => u.owner === 0 && u.type === 'villager'));
+        toast('Làng đang chờ lệnh. Chia dân lấy lương thực, gỗ và vàng.');
+      }
+      function menu() {
+        started = false;
+        paused = false;
+        keys.clear();
+        $('start').hidden = false;
+        $('help-modal').hidden = true;
+        $('result').hidden = true;
+        $('game-ui').hidden = true;
+        renderedResult = false;
+        placement = null;
+        attackMove = false;
+        cam = { x: 10, y: 15 };
+      }
+      $('play').onclick = startGame;
+      $('again').onclick = menu;
+      $('new-game').onclick = menu;
+      function finish() {
+        renderedResult = true;
+        const win = game.result === 'victory';
+        $('result-eyebạnw').textContent = win
+          ? 'LÁ CỜ VẪN TUNG BAY'
+          : 'BIÊN NIÊN SỬ GHI MỘT THẤT BẠI';
+        $('result-title').textContent = win ? 'Khu rừng thuộc về bạn.' : 'Ngôi làng đã thất thủ.';
+        $('result-text').textContent = win
+          ? 'Sở chỉ huy đối phương đã bị hạ. Những con đường qua Rừng Đen đã được kiểm soát.'
+          : 'Thử chia dân khai thác sớm, mở rộng dân số và dùng giáo để chặn kỵ binh trước khi phản công.';
+        $('result-stats').innerHTML =
+          `<div><b>${Math.floor(game.time / 60)}:${String(Math.floor(game.time % 60)).padStart(2, '0')}</b>Thời gian trận</div><div><b>${game.metrics.kills}</b>Quân địch bị hạ</div><div><b>${game.metrics.gathered}</b>Tài nguyên đã giao</div>`;
+        $('result').hidden = false;
+        tone(win ? 'win' : 'lose');
+      }
+      /* Small bounded WebAudio cue pool; no network assets or fake recorded voices. */
+      let audio = null,
+        audioOn = false,
+        voices = [],
+        lastTone = 0;
+      function initAudio() {
+        try {
+          audio = new (window.AudioContext || window.webkitAudioContext)();
+          for (let i = 0; i < 8; i++) {
+            const osc = audio.createOscillator(),
+              gain = audio.createGain();
+            gain.gain.value = 0;
+            osc.type = i % 2 ? 'triangle' : 'sine';
+            osc.connect(gain);
+            gain.connect(audio.destination);
+            osc.start();
+            voices.push({ osc, gain, until: 0 });
+          }
+        } catch {
+          toast('Trình duyệt không hỗ trợ âm thanh.');
+          audioOn = false;
+        }
+      }
+      function tone(type) {
+        if (!audioOn || !audio) return;
+        const now = audio.currentTime;
+        if (now - lastTone < 0.06) return;
+        const v = voices.find((v) => v.until <= now);
+        if (!v) return;
+        lastTone = now;
+        const freq =
+          { select: 330, order: 440, build: 260, hit: 100, win: 660, lose: 155 }[type] || 330;
+        v.osc.frequency.setValueAtTime(freq, now);
+        v.osc.frequency.exponentialRampToValueAtTime(freq * 0.75, now + 0.15);
+        v.gain.gain.cancelScheduledValues(now);
+        v.gain.gain.setValueAtTime(0.035, now);
+        v.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        v.until = now + 0.2;
+      }
+      $('sound').onclick = async () => {
+        if (!audio) initAudio();
+        if (!audio) return;
+        audioOn = !audioOn;
+        if (audioOn) await audio.resume();
+        else
+          for (const v of voices) {
+            v.gain.gain.cancelScheduledValues(audio.currentTime);
+            v.gain.gain.setValueAtTime(0, audio.currentTime);
+          }
+        $('sound').textContent = audioOn ? 'Âm: bật' : 'Âm: tắt';
+        tone('select');
+      };
+      function resize() {
+        width = innerWidth;
+        height = innerHeight;
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      makeGround();
+      function frame(now) {
+        const realDt = Math.min(0.15, (now - last) / 1000 || 0);
+        last = now;
+        if (started && !renderedResult) {
+          if (!paused) {
+            accumulator += realDt * speed;
+            let budget = 8;
+            while (accumulator >= STEP && budget-- > 0) {
+              game.step();
+              accumulator -= STEP;
+            }
+            if (game.result) finish();
+          }
+          const dx =
+              (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
+              (keys.has('a') || keys.has('arrowleft') ? 1 : 0),
+            dy =
+              (keys.has('s') || keys.has('arrowdown') ? 1 : 0) -
+              (keys.has('w') || keys.has('arrowup') ? 1 : 0);
+          cam.x = clamp(cam.x + ((dx + dy * 2) * realDt * 7) / zoom, 0, W);
+          cam.y = clamp(cam.y + ((dy * 2 - dx) * realDt * 7) / zoom, 0, H);
+          for (const e of game.events.splice(0)) {
+            if (e.type === 'wave' || e.type === 'complete') toast(e.text);
+          }
+          if (now - uiClock > 130) {
+            uiClock = now;
+            updateUI();
+          }
+        }
+        if (toastUntil && now > toastUntil) {
+          $('toast').classList.remove('show');
+          toastUntil = 0;
+        }
+        render();
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+      // Opt-in inspection hook for real-browser regression checks (never active by default).
+      if (new URLSearchParams(location.search).has('test'))
+        window.__RTS_DEMO__ = {
+          get game() {
+            return game;
+          },
+          get selected() {
+            return [...selection];
+          },
+          get paused() {
+            return paused;
+          },
+          get cam() {
+            return { ...cam };
+          },
+          start: startGame,
+          screen,
+          world,
+          select: (ids) => setSelection(game.units.filter((u) => ids.includes(u.id))),
+          step: (n) => {
+            for (let i = 0; i < n; i++) game.step();
+            updateUI();
+            if (game.result && !renderedResult) finish();
+          },
+          setPaused: (v) => {
+            paused = v;
+            updateUI();
+          },
+          model: DEMO_MODEL,
+        };
+    </script>
+  </body>
+</html>
