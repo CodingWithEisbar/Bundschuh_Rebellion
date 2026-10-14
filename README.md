@@ -14,8 +14,9 @@ Engine được ghim: **Godot 4.5.2 Standard**, GDScript có kiểu dữ liệu.
 Tải [demo/bundschuh_rebellion.html](demo/bundschuh_rebellion.html) bằng **Download raw file**
 trên GitHub, rồi mở file HTML bằng trình duyệt máy tính. Không cần cài Godot hoặc
 chạy server. Có hai phe, economy, xây nhà, tuyển quân, AI, minimap và thắng/thua. Menu có
-nhạc MP3 được nhúng sẵn, nghe được offline; nếu trình duyệt chặn tự phát, bấm **▶**
-ngay trong player. Có nút **Tắt nhạc** riêng.
+nhạc M4A được nhúng sẵn, tự phát khi mở menu và dừng khi vào trận, nghe được offline.
+Phần điều khiển nhạc được ẩn; nếu trình duyệt chặn tự phát, tương tác trong menu
+(ví dụ chọn phe) để phát nhạc. Chữ giới thiệu hiện dần mỗi lần mở menu.
 
 Đây là bản gameplay Canvas độc lập dùng base stats JSON của repo, không phải bản
 export Godot. [Hướng dẫn và phạm vi demo](demo/README.md) có điều khiển, thông số

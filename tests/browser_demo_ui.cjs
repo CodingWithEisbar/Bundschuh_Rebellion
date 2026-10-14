@@ -196,7 +196,7 @@ fs.mkdirSync(out, { recursive: true });
     page = await context.newPage();
     await page.setViewportSize({ width: 1024, height: 768 });
     page.on('pageerror', (e) => errors.push(String(e)));
-    page.on('request', (r) => requests.push(r.url()));
+    page.on('request', (r) => requests.push(r.url().split(',')[0]));
     await page.goto(
       pathToFileURL(path.join(root, 'demo/bundschuh_rebellion.html')).href + '?test=1',
     );
@@ -238,7 +238,7 @@ fs.mkdirSync(out, { recursive: true });
     );
     check(errors.length === 0, 'no page exceptions');
     check(
-      requests.every((u) => u.startsWith('file:') || u.startsWith('data:audio/mpeg;')),
+      requests.every((u) => u.startsWith('file:') || u.startsWith('data:audio/mp4;')),
       'no CDN, fetch, font or other network requests',
     );
     fs.writeFileSync(

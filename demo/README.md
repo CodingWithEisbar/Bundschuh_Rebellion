@@ -6,28 +6,34 @@ Trên GitHub, mở file rồi chọn **Download raw file** ở góc phải. Lưu
 `.html`, sau đó mở bằng Chrome, Edge hoặc Firefox trên máy tính. Hoặc tải cả
 repo bằng **Code → Download ZIP**, giải nén và mở file trong `demo/`.
 Gameplay không cần Godot, server, Internet, tài khoản, package hay asset ngoài.
-Nhạc MP3 ở menu được nhúng sẵn trong HTML và cũng nghe được offline. Trang xem source của GitHub
+Nhạc M4A ở menu được nhúng sẵn trong HTML và cũng nghe được offline. Trang xem source của GitHub
 không chạy HTML; cần tải file về trước.
 
-Đã kiểm tra thực tế bằng Chromium, mở qua `file://` với network offline.
-Firefox/Edge dùng API tiêu chuẩn tương thích nhưng chưa được kiểm thử riêng.
+Đã kiểm tra thực tế bằng Chromium/Edge, mở qua `file://` với network offline.
+Firefox dùng API tiêu chuẩn tương thích nhưng chưa được kiểm thử riêng.
 
 ## Nhạc nền menu
 
-MP3 **Wir sind des Geyers schwarzer Haufen** do người dùng cung cấp trong
-`sources/` được nhúng nguyên bản dưới dạng base64 trong HTML. Chỉ cần mang theo
-một file HTML, không cần MP3 riêng, Internet, YouTube hoặc server. Nhạc lặp ở
-menu mở đầu; trang tự yêu cầu phát ngay khi mở.
+M4A **Wir sind des Geyers schwarzer Haufen** do người dùng cung cấp trong
+`sources/Wir sind des Geyers schwarzer Haufen.m4a` được nhúng nguyên bản dưới dạng
+base64 trong HTML, với MIME `audio/mp4`. Chỉ cần mang theo một file HTML, không cần
+file nhạc riêng, Internet, YouTube hoặc server. Bản gốc dùng codec ALAC; HTML cũng
+nhúng bản AAC 192 kb/s chuyển từ cùng file để trình duyệt không hỗ trợ ALAC vẫn
+phát được. Không đổi file nguồn. Nhạc lặp ở menu; trang tự yêu cầu phát mỗi lần mở menu.
 
-**Nếu trình duyệt chặn tự phát có tiếng, bấm ▶ ngay trong trình phát.** Thanh
-điều khiển âm thanh luôn hiện ở menu khi nhạc được bật, cho phép chỉnh âm lượng
-và tạm dừng. Trạng thái chỉ ghi đang phát khi nhận sự kiện phát thực tế.
+**Toàn bộ khối nhạc và trình điều khiển được ẩn.** Nếu trình duyệt chặn tự phát có
+tiếng, nhạc sẽ thử phát lại khi người chơi tương tác trong menu (ví dụ chọn phe
+bằng chuột hoặc bàn phím). Browser policy vẫn quyết định có cho phép phát hay
+không; không thể bảo đảm tự phát có tiếng trước mọi tương tác.
 
-**Vào trận** hoặc ẩn tab sẽ dừng nhạc và giải phóng player. Khi quay lại menu/tab,
-nhạc tự tải lại từ đầu nếu vẫn bật. **Tắt nhạc** giữ nhạc tắt qua các lần chuyển
-này; bấm **Bật nhạc** để bật lại. Mất/có mạng không làm gián đoạn nhạc đã nhúng.
-Lựa chọn áp dụng trong phiên mở file hiện tại. Nút **Âm** trong trận chỉ điều khiển
-âm báo gameplay.
+**Vào trận** hoặc ẩn tab sẽ dừng nhạc và giải phóng player, kể cả khi đang tải.
+Khi quay lại menu/tab, nhạc tự tải lại từ đầu. Mất/có mạng không làm gián đoạn nhạc
+đã nhúng. Nút **Âm** trong trận chỉ điều khiển âm báo gameplay.
+
+Khối giới thiệu bên trái bay vào cùng nhau từ trái sang phải 180 px, đồng thời hiện
+dần trong 1,6 giây. Hiệu ứng bắt đầu sau khi menu được vẽ lên màn hình, chạy lại
+mỗi lần mở menu hoặc trở lại tab. Thiết lập
+**Reduce motion** của hệ thống/trình duyệt sẽ hiển thị chữ ngay, không chuyển động.
 
 ## Trận đầu tiên
 
@@ -68,13 +74,13 @@ trận, bao gồm đối phương. Có thể tạm dừng để ra lệnh hoặc
 Rời tab hoặc cửa sổ sẽ tự tạm dừng. Trở lại rồi nhấn Space. Thiết kế cho chuột
 và bàn phím, khuyến nghị cửa sổ từ 1024×768. Không có lưu trận; mở lại/reset
 bắt đầu trận mới. Âm báo gameplay tắt mặc định, bật bằng nút **Âm**. Nhạc menu
-có nút **Bật nhạc** riêng.
+tự phát và không có điều khiển hiển thị.
 
 ## Phạm vi bản demo
 
 Đây là **bản gameplay độc lập bằng Canvas 2D/JavaScript**, không phải Godot Web
 export và không thay thế source Godot của Stage 1–5. Một file chứa giao diện,
-đồ họa vẽ bằng mã, nhạc MP3 menu, âm báo tổng hợp và snapshot JSON base stats của repo.
+đồ họa vẽ bằng mã, nhạc M4A menu, âm báo tổng hợp và snapshot JSON base stats của repo.
 
 Có hai phe điều khiển được, map rừng có seed, chọn/kéo quân, A* tám hướng không
 cắt góc, hàng đợi path budget, tránh va chạm cục bộ, bốn tài nguyên hữu hạn,
